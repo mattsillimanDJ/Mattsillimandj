@@ -1,4 +1,4 @@
-import portraitImage from 'figma:asset/6cb5a91d9eb5e309e0cfe1feeb01d7ac72dd71a9.png';
+import portraitImage from import portraitImage from '/images/portrait.png';
 
 export function Hero() {
   return (
