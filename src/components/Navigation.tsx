@@ -1,4 +1,4 @@
-import logoImage from import logoImage from '/images/logo.png';
+import logoImage from '/images/logo.png';
 
 interface NavigationProps {
   activeSection: string;
