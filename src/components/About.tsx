@@ -1,4 +1,4 @@
-import aboutBgImage from 'figma:asset/337b9c6c7d3df95dea93108b026bfa82778c10f0.png';
+import aboutBgImage from '/images/about-bg.png';
 
 export function About() {
   return (
