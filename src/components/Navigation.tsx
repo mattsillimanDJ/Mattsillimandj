@@ -1,4 +1,4 @@
-import logoImage from 'figma:asset/b6c8cfbfa52998edbb3204299eb4be6a364fcb78.png';
+import logoImage from import logoImage from '/images/logo.png';
 
 interface NavigationProps {
   activeSection: string;
