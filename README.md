@@ -1,7 +1,7 @@
 
-  # my potfolio
+  # mattsillimandj
 
-  This is a code bundle for my potfolio. The original project is available at https://www.figma.com/design/UZHkjbaLkDLm4q056gNyt4/my-potfolio.
+  This is a code bundle for mattsillimandj. The original project is available at https://www.figma.com/design/UZHkjbaLkDLm4q056gNyt4/mattsillimandj.
 
   ## Running the code
 
