@@ -1,4 +1,4 @@
-import portraitImage from import portraitImage from '/images/portrait.png';
+import portraitImage from '/images/portrait.png';
 
 export function Hero() {
   return (
