@@ -1,4 +1,6 @@
 import { Mail, Instagram, Music2, Facebook, Video } from 'lucide-react';
+import contactBg from '/images/contact-bg.png';
+
 import contactBg from 'figma:asset/10c78ea7188f8be80d2cf56f40053cbf81ef5eb9.png';
 
 export function Contact() {
