@@ -1,6 +1,56 @@
-import portraitImage from '/images/portrait.png';
+import { useState, useEffect } from 'react';
+import { projectId, publicAnonKey } from '../utils/supabase/info';
+import portraitImage from 'figma:asset/6cb5a91d9eb5e309e0cfe1feeb01d7ac72dd71a9.png';
 
 export function Hero() {
+  const [content, setContent] = useState({
+    title: 'MATT SILLIMAN',
+    subtitle: 'Music Producer • DJ',
+    description: '',
+  });
+  const [imageUrl, setImageUrl] = useState<string>(portraitImage);
+
+  useEffect(() => {
+    // Fetch content from backend
+    const loadContent = async () => {
+      try {
+        const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-80948ead/cms/content`, {
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`,
+          },
+        });
+        const data = await response.json();
+        const heroContent = data.content.find((item: any) => item.key === 'cms_content_hero');
+        if (heroContent) {
+          setContent(heroContent.value);
+        }
+      } catch (err) {
+        console.error('Failed to load hero content:', err);
+      }
+    };
+
+    // Fetch images from backend
+    const loadImages = async () => {
+      try {
+        const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-80948ead/cms/images`, {
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`,
+          },
+        });
+        const data = await response.json();
+        const portrait = data.images.find((item: any) => item.key === 'cms_image_portrait');
+        if (portrait) {
+          setImageUrl(portrait.value);
+        }
+      } catch (err) {
+        console.error('Failed to load portrait image:', err);
+      }
+    };
+
+    loadContent();
+    loadImages();
+  }, []);
+
   return (
     <section id="hero" className="min-h-screen flex items-center justify-center relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-black via-black/95 to-black"></div>
@@ -8,19 +58,24 @@ export function Hero() {
       {/* Portrait Image - positioned right of center */}
       <div className="absolute top-1/2 -translate-y-1/2 w-[48rem] h-[48rem] md:w-[60rem] md:h-[60rem] lg:w-[72rem] lg:h-[72rem] opacity-70 pointer-events-none" style={{ left: 'calc(50% - 2in)' }}>
         <img 
-          src={portraitImage} 
-          alt="Matt Silliman" 
+          src={imageUrl} 
+          alt={content.title} 
           className="w-full h-full object-cover rounded-full"
         />
       </div>
       
       <div className="relative z-10 text-center px-6">
         <h1 className="text-7xl md:text-8xl lg:text-9xl mb-6 tracking-tight">
-          MATT SILLIMAN
+          {content.title}
         </h1>
         <p className="text-xl md:text-2xl text-white/60 tracking-widest uppercase">
-          Music Producer • DJ
+          {content.subtitle}
         </p>
+        {content.description && (
+          <p className="mt-6 text-lg text-white/50 max-w-2xl mx-auto">
+            {content.description}
+          </p>
+        )}
       </div>
       
       <div className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce">

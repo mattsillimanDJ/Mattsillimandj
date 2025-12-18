@@ -1,10 +1,36 @@
-import logoImage from '/images/logo.png';
+import { useState, useEffect } from 'react';
+import { projectId, publicAnonKey } from '../utils/supabase/info';
+import logoImage from 'figma:asset/b6c8cfbfa52998edbb3204299eb4be6a364fcb78.png';
 
 interface NavigationProps {
   activeSection: string;
 }
 
 export function Navigation({ activeSection }: NavigationProps) {
+  const [logoUrl, setLogoUrl] = useState<string>(logoImage);
+
+  useEffect(() => {
+    // Fetch logo from backend
+    const loadLogo = async () => {
+      try {
+        const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-80948ead/cms/images`, {
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`,
+          },
+        });
+        const data = await response.json();
+        const logo = data.images.find((item: any) => item.key === 'cms_image_logo');
+        if (logo) {
+          setLogoUrl(logo.value);
+        }
+      } catch (err) {
+        console.error('Failed to load logo:', err);
+      }
+    };
+
+    loadLogo();
+  }, []);
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -27,7 +53,7 @@ export function Navigation({ activeSection }: NavigationProps) {
             onClick={() => scrollToSection('hero')}
             className="hover:opacity-70 transition-opacity"
           >
-            <img src={logoImage} alt="Matt Silliman Logo" className="h-24" />
+            <img src={logoUrl} alt="Matt Silliman Logo" className="h-24" />
           </button>
           
           <div className="flex gap-8">
