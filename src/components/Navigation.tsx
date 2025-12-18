@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
-import logoImage from 'figma:asset/b6c8cfbfa52998edbb3204299eb4be6a364fcb78.png';
 
 interface NavigationProps {
   activeSection: string;
 }
 
 export function Navigation({ activeSection }: NavigationProps) {
-  const [logoUrl, setLogoUrl] = useState<string>(logoImage);
+  const [logoUrl, setLogoUrl] = useState<string>('/logo.png'); // Changed to regular path
 
   useEffect(() => {
     // Fetch logo from backend

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
-import portraitImage from 'figma:asset/6cb5a91d9eb5e309e0cfe1feeb01d7ac72dd71a9.png';
 
 export function Hero() {
   const [content, setContent] = useState({
@@ -8,7 +7,7 @@ export function Hero() {
     subtitle: 'Music Producer • DJ',
     description: '',
   });
-  const [imageUrl, setImageUrl] = useState<string>(portraitImage);
+  const [imageUrl, setImageUrl] = useState<string>('/portrait.png'); // Changed to regular path
 
   useEffect(() => {
     // Fetch content from backend
