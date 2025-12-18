@@ -7,7 +7,8 @@ export function Hero() {
     subtitle: 'Music Producer • DJ',
     description: '',
   });
-  const [imageUrl, setImageUrl] = useState<string>('/portrait.png'); // Changed to regular path
+const [imageUrl, setImageUrl] = useState<string>('/images/portrait.png');
+Changed to regular path
 
   useEffect(() => {
     // Fetch content from backend
