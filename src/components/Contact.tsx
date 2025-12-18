@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Mail, Instagram, Music2, Facebook, Video } from 'lucide-react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
-import contactBg from 'figma:asset/10c78ea7188f8be80d2cf56f40053cbf81ef5eb9.png';
 
 export function Contact() {
   const [content, setContent] = useState({
@@ -12,7 +11,7 @@ export function Contact() {
     facebook: 'mattsilliman',
     tiktok: 'mattsilliman_dj',
   });
-  const [bgImageUrl, setBgImageUrl] = useState<string>(contactBg);
+  const [bgImageUrl, setBgImageUrl] = useState<string>('/contact-bg.png'); // Changed to regular path
 
   useEffect(() => {
     // Fetch content from backend

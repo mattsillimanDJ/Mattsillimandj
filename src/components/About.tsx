@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
-import aboutBgImage from 'figma:asset/337b9c6c7d3df95dea93108b026bfa82778c10f0.png';
 
 export function About() {
   const [content, setContent] = useState({
@@ -17,7 +16,7 @@ Beyond the booth and the studio, Matt is also the founder of Captains of Revelry
 
 At his core, Matt Silliman is driven by one simple idea. Music should make people feel something real. That belief guides every set, every track, and every room he steps into.`
   });
-  const [bgImageUrl, setBgImageUrl] = useState<string>(aboutBgImage);
+  const [bgImageUrl, setBgImageUrl] = useState<string>('/about-bg.png'); // Changed to regular path
 
   useEffect(() => {
     // Fetch content from backend
