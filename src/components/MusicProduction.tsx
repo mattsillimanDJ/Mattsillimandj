@@ -13,6 +13,14 @@ interface MusicItem {
   embedCode: string;
 }
 
+const COMPACT_SOUNDCLOUD_PLAYER_HEIGHT = '166';
+
+function normalizeSoundCloudEmbedHtml(embedCode: string) {
+  return embedCode
+    .replace(/height="[^"]*"/i, `height="${COMPACT_SOUNDCLOUD_PLAYER_HEIGHT}"`)
+    .replace(/visual=true/gi, 'visual=false');
+}
+
 function MusicEmbed({ embedCode }: { embedCode: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -21,7 +29,16 @@ function MusicEmbed({ embedCode }: { embedCode: string }) {
     if (!container) return;
 
     // Owner-controlled CMS embed code may include widget scripts from music services.
-    container.innerHTML = embedCode;
+    container.innerHTML = normalizeSoundCloudEmbedHtml(embedCode);
+    container.querySelectorAll('iframe').forEach((iframe) => {
+      iframe.setAttribute('width', '100%');
+      iframe.setAttribute('height', COMPACT_SOUNDCLOUD_PLAYER_HEIGHT);
+      iframe.style.width = '100%';
+      iframe.style.maxWidth = '100%';
+      iframe.style.height = `${COMPACT_SOUNDCLOUD_PLAYER_HEIGHT}px`;
+      iframe.style.maxHeight = `${COMPACT_SOUNDCLOUD_PLAYER_HEIGHT}px`;
+      iframe.style.display = 'block';
+    });
     container.querySelectorAll('script').forEach((script) => {
       const executableScript = document.createElement('script');
       Array.from(script.attributes).forEach((attribute) => {
@@ -36,7 +53,7 @@ function MusicEmbed({ embedCode }: { embedCode: string }) {
     };
   }, [embedCode]);
 
-  return <div ref={containerRef} className="music-embed w-full" />;
+  return <div ref={containerRef} className="music-embed w-full overflow-hidden" />;
 }
 
 function CmsMusicItem({ item }: { item: MusicItem }) {
@@ -52,16 +69,20 @@ function CmsMusicItem({ item }: { item: MusicItem }) {
     async function fetchSoundCloudEmbed() {
       try {
         setOEmbedFailed(false);
-        const response = await fetch(
-          `https://soundcloud.com/oembed?format=json&url=${encodeURIComponent(soundCloudUrl)}`
-        );
+        const oEmbedUrl = new URL('https://soundcloud.com/oembed');
+        oEmbedUrl.searchParams.set('format', 'json');
+        oEmbedUrl.searchParams.set('url', soundCloudUrl);
+        oEmbedUrl.searchParams.set('maxheight', COMPACT_SOUNDCLOUD_PLAYER_HEIGHT);
+        oEmbedUrl.searchParams.set('visual', 'false');
+
+        const response = await fetch(oEmbedUrl.toString());
 
         if (!response.ok) {
           throw new Error('Failed to load SoundCloud embed');
         }
 
         const data = await response.json();
-        setOEmbedHtml(data.html || '');
+        setOEmbedHtml(normalizeSoundCloudEmbedHtml(data.html || ''));
         setOEmbedTitle(data.title || '');
       } catch (err) {
         console.error('Error fetching SoundCloud embed:', err);
