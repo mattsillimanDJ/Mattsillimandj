@@ -6,6 +6,7 @@ interface MusicItem {
   id: string;
   title: string;
   description?: string;
+  soundCloudUrl?: string;
   embedCode: string;
 }
 
@@ -35,9 +36,66 @@ function MusicEmbed({ embedCode }: { embedCode: string }) {
   return <div ref={containerRef} className="music-embed w-full" />;
 }
 
+function CmsMusicItem({ item }: { item: MusicItem }) {
+  const [oEmbedHtml, setOEmbedHtml] = useState('');
+  const [oEmbedTitle, setOEmbedTitle] = useState('');
+  const [oEmbedFailed, setOEmbedFailed] = useState(false);
+  const title = item.title || oEmbedTitle || 'Music Embed';
+  const soundCloudUrl = item.soundCloudUrl?.trim();
+
+  useEffect(() => {
+    if (!soundCloudUrl) return;
+
+    async function fetchSoundCloudEmbed() {
+      try {
+        setOEmbedFailed(false);
+        const response = await fetch(
+          `https://soundcloud.com/oembed?format=json&url=${encodeURIComponent(soundCloudUrl)}`
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to load SoundCloud embed');
+        }
+
+        const data = await response.json();
+        setOEmbedHtml(data.html || '');
+        setOEmbedTitle(data.title || '');
+      } catch (err) {
+        console.error('Error fetching SoundCloud embed:', err);
+        setOEmbedFailed(true);
+      }
+    }
+
+    fetchSoundCloudEmbed();
+  }, [soundCloudUrl]);
+
+  return (
+    <div className="border border-white/10 p-6 bg-white/5 hover:bg-white/10 transition-all">
+      <h3 className="text-xl mb-3">{title}</h3>
+      {item.description && (
+        <p className="text-white/60 leading-relaxed mb-5">{item.description}</p>
+      )}
+      {oEmbedHtml ? (
+        <MusicEmbed embedCode={oEmbedHtml} />
+      ) : item.embedCode.trim() ? (
+        <MusicEmbed embedCode={item.embedCode} />
+      ) : oEmbedFailed && soundCloudUrl ? (
+        <a
+          href={soundCloudUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex text-white/70 hover:text-white transition-colors"
+        >
+          Open on SoundCloud
+        </a>
+      ) : null}
+    </div>
+  );
+}
+
 export function MusicProduction() {
   const [cmsMusicItems, setCmsMusicItems] = useState<MusicItem[]>([]);
-  const cmsEmbeds = cmsMusicItems.filter((item) => item.embedCode.trim());
+  const cmsEmbeds = cmsMusicItems.filter((item) => item.soundCloudUrl?.trim() || item.embedCode.trim());
 
   useEffect(() => {
     async function fetchMusicItems() {
@@ -52,7 +110,7 @@ export function MusicProduction() {
 
         const data = await response.json();
         const musicContent = data.content?.find((item: any) => (
-          item.key === 'cms_content_music' || item.items?.some((musicItem: any) => musicItem.embedCode)
+          item.key === 'cms_content_music' || item.items?.some((musicItem: any) => musicItem.soundCloudUrl || musicItem.embedCode)
         ));
         const musicData = musicContent?.value || musicContent;
         setCmsMusicItems(musicData?.items || []);
@@ -168,16 +226,7 @@ export function MusicProduction() {
         {cmsEmbeds.length > 0 ? (
           <div id="recent-releases" className="space-y-6">
             {cmsEmbeds.map((item) => (
-              <div
-                key={item.id}
-                className="border border-white/10 p-6 bg-white/5 hover:bg-white/10 transition-all"
-              >
-                <h3 className="text-xl mb-3">{item.title || 'Music Embed'}</h3>
-                {item.description && (
-                  <p className="text-white/60 leading-relaxed mb-5">{item.description}</p>
-                )}
-                <MusicEmbed embedCode={item.embedCode} />
-              </div>
+              <CmsMusicItem key={item.id} item={item} />
             ))}
           </div>
         ) : (

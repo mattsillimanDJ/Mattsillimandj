@@ -27,6 +27,7 @@ interface MusicItem {
   id: string;
   title: string;
   description: string;
+  soundCloudUrl: string;
   embedCode: string;
 }
 
@@ -92,6 +93,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
       id: savedItems[index]?.id || `music-${index + 1}`,
       title: savedItems[index]?.title || '',
       description: savedItems[index]?.description || '',
+      soundCloudUrl: savedItems[index]?.soundCloudUrl || '',
       embedCode: savedItems[index]?.embedCode || '',
     }));
   };
@@ -592,7 +594,18 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor={`music-embed-${index}`} className="text-white">Embed Code</Label>
+                        <Label htmlFor={`music-soundcloud-${index}`} className="text-white">SoundCloud URL</Label>
+                        <Input
+                          id={`music-soundcloud-${index}`}
+                          value={item.soundCloudUrl}
+                          onChange={(e) => updateMusicItem(index, 'soundCloudUrl', e.target.value)}
+                          className="bg-zinc-800 border-zinc-700 text-white"
+                          placeholder="https://soundcloud.com/artist/track-name"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`music-embed-${index}`} className="text-white">Raw Embed Code (optional fallback)</Label>
                         <Textarea
                           id={`music-embed-${index}`}
                           value={item.embedCode}
