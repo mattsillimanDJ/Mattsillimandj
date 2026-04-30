@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { normalizeCmsImages } from '../utils/cmsImages';
 
 export function About() {
   const [content, setContent] = useState({
@@ -16,7 +17,7 @@ Beyond the booth and the studio, Matt is also the founder of Captains of Revelry
 
 At his core, Matt Silliman is driven by one simple idea. Music should make people feel something real. That belief guides every set, every track, and every room he steps into.`
   });
-  const [bgImageUrl, setBgImageUrl] = useState<string>('/about-bg.png'); // Changed to regular path
+  const [bgImageUrl, setBgImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     // Fetch content from backend
@@ -46,9 +47,9 @@ At his core, Matt Silliman is driven by one simple idea. Music should make peopl
           },
         });
         const data = await response.json();
-        const aboutBg = data.images.find((item: any) => item.key === 'cms_image_aboutBg');
-        if (aboutBg) {
-          setBgImageUrl(aboutBg.value);
+        const images = normalizeCmsImages(data.images);
+        if (images.aboutBg) {
+          setBgImageUrl(images.aboutBg);
         }
       } catch (err) {
         console.error('Failed to load about background:', err);
@@ -62,10 +63,12 @@ At his core, Matt Silliman is driven by one simple idea. Music should make peopl
   return (
     <section id="about" className="min-h-screen flex items-center py-24 px-6 relative">
       {/* Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center opacity-45"
-        style={{ backgroundImage: `url(${bgImageUrl})` }}
-      />
+      {bgImageUrl && (
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-45"
+          style={{ backgroundImage: `url(${bgImageUrl})` }}
+        />
+      )}
       
       {/* Content */}
       <div className="max-w-4xl mx-auto relative z-10">

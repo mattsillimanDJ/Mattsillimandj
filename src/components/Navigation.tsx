@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { normalizeCmsImages } from '../utils/cmsImages';
 
 interface NavigationProps {
   activeSection: string;
 }
 
 export function Navigation({ activeSection }: NavigationProps) {
-  const [logoUrl, setLogoUrl] = useState<string>('/logo.png'); // Changed to regular path
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     // Fetch logo from backend
@@ -18,9 +19,9 @@ export function Navigation({ activeSection }: NavigationProps) {
           },
         });
         const data = await response.json();
-        const logo = data.images.find((item: any) => item.key === 'cms_image_logo');
-        if (logo) {
-          setLogoUrl(logo.value);
+        const images = normalizeCmsImages(data.images);
+        if (images.logo) {
+          setLogoUrl(images.logo);
         }
       } catch (err) {
         console.error('Failed to load logo:', err);
@@ -52,7 +53,7 @@ export function Navigation({ activeSection }: NavigationProps) {
             onClick={() => scrollToSection('hero')}
             className="hover:opacity-70 transition-opacity"
           >
-            <img src={logoUrl} alt="Matt Silliman Logo" className="h-24" />
+            {logoUrl && <img src={logoUrl} alt="Matt Silliman Logo" className="h-24" />}
           </button>
           
           <div className="flex gap-8">

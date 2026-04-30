@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Mail, Instagram, Music2, Facebook, Video } from 'lucide-react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { normalizeCmsImages } from '../utils/cmsImages';
 
 export function Contact() {
   const [content, setContent] = useState({
@@ -11,7 +12,7 @@ export function Contact() {
     facebook: 'mattsilliman',
     tiktok: 'mattsilliman_dj',
   });
-  const [bgImageUrl, setBgImageUrl] = useState<string>('/contact-bg.png'); // Changed to regular path
+  const [bgImageUrl, setBgImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     // Fetch content from backend
@@ -41,9 +42,9 @@ export function Contact() {
           },
         });
         const data = await response.json();
-        const contactBgImg = data.images.find((item: any) => item.key === 'cms_image_contactBg');
-        if (contactBgImg) {
-          setBgImageUrl(contactBgImg.value);
+        const images = normalizeCmsImages(data.images);
+        if (images.contactBg) {
+          setBgImageUrl(images.contactBg);
         }
       } catch (err) {
         console.error('Failed to load contact background:', err);
@@ -64,13 +65,15 @@ export function Contact() {
   return (
     <section id="contact" className="min-h-screen flex items-center py-24 px-6 relative overflow-hidden">
       {/* Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ 
-          backgroundImage: `url(${bgImageUrl})`,
-          opacity: 0.81
-        }}
-      />
+      {bgImageUrl && (
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${bgImageUrl})`,
+            opacity: 0.81
+          }}
+        />
+      )}
       <div className="absolute inset-0 bg-gradient-to-b from-neutral-950 to-black opacity-80" />
       
       <div className="max-w-4xl mx-auto w-full relative z-10">

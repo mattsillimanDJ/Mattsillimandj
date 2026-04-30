@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { normalizeCmsImages } from '../utils/cmsImages';
 
 export function Hero() {
   const [content, setContent] = useState({
@@ -7,7 +8,7 @@ export function Hero() {
     subtitle: 'Music Producer • DJ',
     description: '',
   });
-  const [imageUrl, setImageUrl] = useState<string>('/portrait.png'); // Changed to regular path
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     // Fetch content from backend
@@ -37,9 +38,9 @@ export function Hero() {
           },
         });
         const data = await response.json();
-        const portrait = data.images.find((item: any) => item.key === 'cms_image_portrait');
-        if (portrait) {
-          setImageUrl(portrait.value);
+        const images = normalizeCmsImages(data.images);
+        if (images.portrait) {
+          setImageUrl(images.portrait);
         }
       } catch (err) {
         console.error('Failed to load portrait image:', err);
@@ -55,16 +56,18 @@ export function Hero() {
       <div className="absolute inset-0 bg-gradient-to-b from-black via-black/95 to-black"></div>
       
       {/* Portrait Image - positioned right of center */}
-      <div className="absolute top-1/2 -translate-y-1/2 w-[48rem] h-[48rem] md:w-[60rem] md:h-[60rem] lg:w-[72rem] lg:h-[72rem] opacity-70 pointer-events-none" style={{ left: 'calc(50% - 2in)' }}>
-        <img 
-          src={imageUrl} 
-          alt={content.title} 
-          className="w-full h-full object-cover rounded-full"
-        />
-      </div>
+      {imageUrl && (
+        <div className="absolute top-1/2 -translate-y-1/2 w-[48rem] h-[48rem] md:w-[60rem] md:h-[60rem] lg:w-[72rem] lg:h-[72rem] opacity-70 pointer-events-none" style={{ left: 'calc(50% - 5.5in)' }}>
+          <img
+            src={imageUrl}
+            alt={content.title}
+            className="w-full h-full object-contain object-right"
+          />
+        </div>
+      )}
       
       <div className="relative z-10 text-center px-6">
-        <h1 className="text-7xl md:text-8xl lg:text-9xl mb-6 tracking-tight">
+        <h1 className="text-7xl md:text-7xl lg:text-8xl mb-6 tracking-tight">
           {content.title}
         </h1>
         <p className="text-xl md:text-2xl text-white/60 tracking-widest uppercase">

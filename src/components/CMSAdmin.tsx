@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { normalizeCmsImages } from '../utils/cmsImages';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -95,14 +96,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
 
       const data = await response.json();
       
-      // Convert array to object
-      const imagesObj: ImageData = {};
-      data.images.forEach((item: any) => {
-        const key = item.key.replace('cms_image_', '');
-        imagesObj[key as keyof ImageData] = item.value;
-      });
-
-      setImages(imagesObj);
+      setImages(normalizeCmsImages(data.images));
     } catch (err) {
       console.error('Failed to load images:', err);
     }
