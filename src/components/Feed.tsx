@@ -2,57 +2,45 @@ import { useEffect, useState } from 'react';
 import { ExternalLink, Instagram } from 'lucide-react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 
-interface InstagramPost {
+interface FeedItem {
   id: string;
+  imageUrl: string;
   caption?: string;
-  media_type: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
-  media_url: string;
-  thumbnail_url?: string;
-  permalink: string;
-  timestamp: string;
+  permalink?: string;
 }
 
 export function Feed() {
-  const [posts, setPosts] = useState<InstagramPost[]>([]);
+  const [items, setItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const instagramUrl = 'https://www.instagram.com/mattsilliman_dj/';
-  const visiblePosts = posts.slice(0, 12);
+  const visibleItems = items.filter((item) => item.imageUrl).slice(0, 12);
 
   useEffect(() => {
-    async function fetchInstagramFeed() {
+    async function fetchFeedItems() {
       try {
-        const response = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/make-server-80948ead/instagram-feed`,
-          {
-            headers: {
-              Authorization: `Bearer ${publicAnonKey}`,
-            },
-          }
-        );
+        const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-80948ead/cms/content`, {
+          headers: {
+            Authorization: `Bearer ${publicAnonKey}`,
+          },
+        });
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-          console.error('Instagram API response error:', {
-            status: response.status,
-            statusText: response.statusText,
-            error: errorData
-          });
-          throw new Error(errorData.error || `Failed to fetch Instagram feed (${response.status})`);
+          throw new Error('Failed to load feed');
         }
 
         const data = await response.json();
-        console.log('Instagram feed data:', data);
-        setPosts(data.data || []);
+        const feedContent = data.content?.find((item: any) => item.key === 'cms_content_feed');
+        setItems(feedContent?.value?.items || []);
       } catch (err) {
-        console.error('Error fetching Instagram feed:', err);
+        console.error('Error fetching feed:', err);
         setError(err instanceof Error ? err.message : 'Failed to load feed');
       } finally {
         setLoading(false);
       }
     }
 
-    fetchInstagramFeed();
+    fetchFeedItems();
   }, []);
 
   return (
@@ -103,7 +91,7 @@ export function Feed() {
           </div>
         )}
 
-        {!loading && !error && posts.length === 0 && (
+        {!loading && !error && visibleItems.length === 0 && (
           <div className="text-center py-20 max-w-2xl mx-auto">
             <div className="bg-white/5 p-8 rounded-lg border border-white/10">
               <Instagram className="w-10 h-10 text-white/60 mx-auto mb-5" />
@@ -125,35 +113,49 @@ export function Feed() {
           </div>
         )}
 
-        {!loading && !error && visiblePosts.length > 0 && (
+        {!loading && !error && visibleItems.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {visiblePosts.map((post) => (
-              <a
-                key={post.id}
-                href={post.permalink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative aspect-square overflow-hidden bg-white/5 hover:bg-white/10 transition-all duration-300"
-              >
-                <img
-                  src={post.media_type === 'VIDEO' ? post.thumbnail_url : post.media_url}
-                  alt={post.caption?.substring(0, 100) || 'Instagram post'}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                {post.media_type === 'VIDEO' && (
-                  <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm px-3 py-1 rounded-full">
-                    <span className="text-xs uppercase tracking-wider">Video</span>
-                  </div>
-                )}
-                {post.caption && (
-                  <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-6 flex items-center justify-center">
-                    <p className="text-sm text-white/80 line-clamp-6">
-                      {post.caption}
-                    </p>
-                  </div>
-                )}
-              </a>
-            ))}
+            {visibleItems.map((item) => {
+              const tileContent = (
+                <>
+                  <img
+                    src={item.imageUrl}
+                    alt={item.caption?.substring(0, 100) || 'Featured feed item'}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  {item.caption && (
+                    <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-6 flex items-center justify-center">
+                      <p className="text-sm text-white/80 line-clamp-6">
+                        {item.caption}
+                      </p>
+                    </div>
+                  )}
+                </>
+              );
+
+              if (item.permalink) {
+                return (
+                  <a
+                    key={item.id}
+                    href={item.permalink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative aspect-square overflow-hidden bg-white/5 hover:bg-white/10 transition-all duration-300"
+                  >
+                    {tileContent}
+                  </a>
+                );
+              }
+
+              return (
+                <div
+                  key={item.id}
+                  className="group relative aspect-square overflow-hidden bg-white/5 hover:bg-white/10 transition-all duration-300"
+                >
+                  {tileContent}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

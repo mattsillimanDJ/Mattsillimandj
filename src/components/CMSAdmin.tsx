@@ -16,6 +16,13 @@ interface CMSAdminProps {
   onLogout: () => void;
 }
 
+interface FeedItem {
+  id: string;
+  imageUrl: string;
+  caption: string;
+  permalink: string;
+}
+
 interface ContentData {
   hero?: {
     title: string;
@@ -33,6 +40,9 @@ interface ContentData {
     soundcloud: string;
     facebook: string;
     tiktok: string;
+  };
+  feed?: {
+    items: FeedItem[];
   };
 }
 
@@ -54,6 +64,16 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
     `https://${projectId}.supabase.co`,
     publicAnonKey
   );
+
+  const getFeedItems = () => {
+    const savedItems = content.feed?.items || [];
+    return Array.from({ length: 12 }, (_, index) => ({
+      id: savedItems[index]?.id || `feed-${index + 1}`,
+      imageUrl: savedItems[index]?.imageUrl || '',
+      caption: savedItems[index]?.caption || '',
+      permalink: savedItems[index]?.permalink || '',
+    }));
+  };
 
   useEffect(() => {
     loadContent();
@@ -164,6 +184,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
 
         setImages(prev => ({ ...prev, [imageName]: data.url }));
         toast.success(`${imageName} uploaded successfully!`);
+        return data.url as string;
       } else {
         toast.error(data.error || 'Failed to upload image');
       }
@@ -173,6 +194,8 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
     } finally {
       setUploading(null);
     }
+
+    return null;
   };
 
   const handleLogout = async () => {
@@ -188,6 +211,26 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
         [field]: value,
       },
     }));
+  };
+
+  const updateFeedItem = (index: number, field: keyof Omit<FeedItem, 'id'>, value: string) => {
+    const items = getFeedItems();
+    items[index] = {
+      ...items[index],
+      [field]: value,
+    };
+
+    setContent(prev => ({
+      ...prev,
+      feed: { items },
+    }));
+  };
+
+  const uploadFeedImage = async (index: number, file: File) => {
+    const imageUrl = await uploadImage(`feed-${index + 1}`, file);
+    if (imageUrl) {
+      updateFeedItem(index, 'imageUrl', imageUrl);
+    }
   };
 
   if (loading) {
@@ -214,6 +257,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
             <TabsTrigger value="hero">Hero</TabsTrigger>
             <TabsTrigger value="about">About</TabsTrigger>
             <TabsTrigger value="contact">Contact</TabsTrigger>
+            <TabsTrigger value="feed">Feed</TabsTrigger>
             <TabsTrigger value="images">Images</TabsTrigger>
           </TabsList>
 
@@ -371,6 +415,80 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                 <Button onClick={() => saveContent('contact')} disabled={saving}>
                   <Save className="mr-2 h-4 w-4" />
                   {saving ? 'Saving...' : 'Save Contact Content'}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Feed Section */}
+          <TabsContent value="feed">
+            <Card className="bg-zinc-900 border-zinc-800">
+              <CardHeader>
+                <CardTitle className="text-white">Feed / Social</CardTitle>
+                <CardDescription>Manage up to 12 featured social feed items</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {getFeedItems().map((item, index) => (
+                    <div key={item.id} className="space-y-4 border border-zinc-800 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-white">Feed Item {index + 1}</Label>
+                        {uploading === `feed-${index + 1}` && (
+                          <span className="text-sm text-white/60">Uploading...</span>
+                        )}
+                      </div>
+
+                      {item.imageUrl ? (
+                        <img
+                          src={item.imageUrl}
+                          alt={`Feed item ${index + 1}`}
+                          className="aspect-square w-full rounded object-cover bg-zinc-800"
+                        />
+                      ) : (
+                        <div className="aspect-square w-full rounded bg-zinc-800 flex items-center justify-center">
+                          <ImageIcon className="h-8 w-8 text-white/40" />
+                        </div>
+                      )}
+
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) uploadFeedImage(index, file);
+                        }}
+                        className="bg-zinc-800 border-zinc-700 text-white"
+                        disabled={uploading === `feed-${index + 1}`}
+                      />
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`feed-caption-${index}`} className="text-white">Caption</Label>
+                        <Textarea
+                          id={`feed-caption-${index}`}
+                          value={item.caption}
+                          onChange={(e) => updateFeedItem(index, 'caption', e.target.value)}
+                          className="bg-zinc-800 border-zinc-700 text-white min-h-[90px]"
+                          placeholder="Optional caption"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`feed-link-${index}`} className="text-white">Link URL</Label>
+                        <Input
+                          id={`feed-link-${index}`}
+                          value={item.permalink}
+                          onChange={(e) => updateFeedItem(index, 'permalink', e.target.value)}
+                          className="bg-zinc-800 border-zinc-700 text-white"
+                          placeholder="https://www.instagram.com/p/..."
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Button onClick={() => saveContent('feed')} disabled={saving}>
+                  <Save className="mr-2 h-4 w-4" />
+                  {saving ? 'Saving...' : 'Save Feed Items'}
                 </Button>
               </CardContent>
             </Card>
