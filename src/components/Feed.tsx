@@ -58,9 +58,10 @@ export function Feed() {
         }
 
         const data = await response.json();
-        const feedContent = data.content?.find((item: any) => item.key === 'cms_content_feed');
-        setItems(feedContent?.value?.items || []);
-        setEmbedCode(feedContent?.value?.embedCode || '');
+        const feedContent = data.content?.find((item: any) => item.key === 'cms_content_feed' || item.embedCode || item.items);
+        const feedData = feedContent?.value || feedContent;
+        setItems(feedData?.items || []);
+        setEmbedCode(feedData?.embedCode || '');
       } catch (err) {
         console.error('Error fetching feed:', err);
         setError(err instanceof Error ? err.message : 'Failed to load feed');
