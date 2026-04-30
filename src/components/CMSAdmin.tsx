@@ -42,6 +42,7 @@ interface ContentData {
     tiktok: string;
   };
   feed?: {
+    embedCode?: string;
     items: FeedItem[];
   };
 }
@@ -222,7 +223,10 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
 
     setContent(prev => ({
       ...prev,
-      feed: { items },
+      feed: {
+        ...prev.feed,
+        items,
+      },
     }));
   };
 
@@ -231,6 +235,16 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
     if (imageUrl) {
       updateFeedItem(index, 'imageUrl', imageUrl);
     }
+  };
+
+  const updateFeedEmbedCode = (value: string) => {
+    setContent(prev => ({
+      ...prev,
+      feed: {
+        embedCode: value,
+        items: getFeedItems(),
+      },
+    }));
   };
 
   if (loading) {
@@ -425,9 +439,23 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
             <Card className="bg-zinc-900 border-zinc-800">
               <CardHeader>
                 <CardTitle className="text-white">Feed / Social</CardTitle>
-                <CardDescription>Manage up to 12 featured social feed items</CardDescription>
+                <CardDescription>Add an Instagram feed embed or manage up to 12 featured social feed items</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="feed-embed-code" className="text-white">Instagram Feed Embed Code</Label>
+                  <Textarea
+                    id="feed-embed-code"
+                    value={content.feed?.embedCode || ''}
+                    onChange={(e) => updateFeedEmbedCode(e.target.value)}
+                    className="bg-zinc-800 border-zinc-700 text-white min-h-[160px] font-mono text-sm"
+                    placeholder="<iframe ...></iframe>"
+                  />
+                  <p className="text-sm text-zinc-400">
+                    If embed code is present, the public Feed section will show it instead of the manual grid.
+                  </p>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {getFeedItems().map((item, index) => (
                     <div key={item.id} className="space-y-4 border border-zinc-800 rounded-lg p-4">

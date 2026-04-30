@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ExternalLink, Instagram } from 'lucide-react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 
@@ -9,12 +9,40 @@ interface FeedItem {
   permalink?: string;
 }
 
+function FeedEmbed({ embedCode }: { embedCode: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Owner-controlled CMS embed code may include widget scripts from feed services.
+    container.innerHTML = embedCode;
+    container.querySelectorAll('script').forEach((script) => {
+      const executableScript = document.createElement('script');
+      Array.from(script.attributes).forEach((attribute) => {
+        executableScript.setAttribute(attribute.name, attribute.value);
+      });
+      executableScript.text = script.text;
+      script.replaceWith(executableScript);
+    });
+
+    return () => {
+      container.innerHTML = '';
+    };
+  }, [embedCode]);
+
+  return <div ref={containerRef} className="feed-embed w-full" />;
+}
+
 export function Feed() {
   const [items, setItems] = useState<FeedItem[]>([]);
+  const [embedCode, setEmbedCode] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const instagramUrl = 'https://www.instagram.com/mattsilliman_dj/';
   const visibleItems = items.filter((item) => item.imageUrl).slice(0, 12);
+  const hasEmbed = embedCode.trim().length > 0;
 
   useEffect(() => {
     async function fetchFeedItems() {
@@ -32,6 +60,7 @@ export function Feed() {
         const data = await response.json();
         const feedContent = data.content?.find((item: any) => item.key === 'cms_content_feed');
         setItems(feedContent?.value?.items || []);
+        setEmbedCode(feedContent?.value?.embedCode || '');
       } catch (err) {
         console.error('Error fetching feed:', err);
         setError(err instanceof Error ? err.message : 'Failed to load feed');
@@ -91,7 +120,13 @@ export function Feed() {
           </div>
         )}
 
-        {!loading && !error && visibleItems.length === 0 && (
+        {!loading && !error && hasEmbed && (
+          <div className="mx-auto max-w-6xl">
+            <FeedEmbed embedCode={embedCode} />
+          </div>
+        )}
+
+        {!loading && !error && !hasEmbed && visibleItems.length === 0 && (
           <div className="text-center py-20 max-w-2xl mx-auto">
             <div className="bg-white/5 p-8 rounded-lg border border-white/10">
               <Instagram className="w-10 h-10 text-white/60 mx-auto mb-5" />
@@ -113,7 +148,7 @@ export function Feed() {
           </div>
         )}
 
-        {!loading && !error && visibleItems.length > 0 && (
+        {!loading && !error && !hasEmbed && visibleItems.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {visibleItems.map((item) => {
               const tileContent = (
