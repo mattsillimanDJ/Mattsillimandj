@@ -2,10 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { Music, Radio, Disc3 } from 'lucide-react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 
+type MusicCategory = 'originals' | 'remixes' | 'live';
+
 interface MusicItem {
   id: string;
   title: string;
   description?: string;
+  category?: MusicCategory;
   soundCloudUrl?: string;
   embedCode: string;
 }
@@ -95,7 +98,9 @@ function CmsMusicItem({ item }: { item: MusicItem }) {
 
 export function MusicProduction() {
   const [cmsMusicItems, setCmsMusicItems] = useState<MusicItem[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<MusicCategory>('originals');
   const cmsEmbeds = cmsMusicItems.filter((item) => item.soundCloudUrl?.trim() || item.embedCode.trim());
+  const filteredCmsEmbeds = cmsEmbeds.filter((item) => (item.category || 'originals') === selectedCategory);
 
   useEffect(() => {
     async function fetchMusicItems() {
@@ -135,18 +140,21 @@ export function MusicProduction() {
       description: 'Creating unique tracks that push the boundaries of electronic music, from deep afro house to tech house.',
       icon: Music,
       scrollTo: 'recent-releases',
+      category: 'originals' as MusicCategory,
     },
     {
       title: 'Remixes & Edits',
       description: 'Reimagining existing tracks with fresh energy and perspective.',
       icon: Disc3,
       scrollTo: 'remixes-edits',
+      category: 'remixes' as MusicCategory,
     },
     {
       title: 'Live Mixes and DJ Sets',
       description: 'Recordings of live sets from all over the globe.',
       icon: Radio,
       scrollTo: 'live-mixes-sets',
+      category: 'live' as MusicCategory,
     },
   ];
 
@@ -207,15 +215,24 @@ export function MusicProduction() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
           {productions.map((item, index) => {
             const Icon = item.icon;
+            const isActive = cmsEmbeds.length > 0 && selectedCategory === item.category;
             return (
               <div
                 key={index}
-                className={`border border-white/10 p-8 bg-white/5 hover:bg-white/10 transition-all ${
-                  item.scrollTo ? 'cursor-pointer' : ''
+                className={`border p-8 hover:bg-white/10 transition-all ${
+                  isActive ? 'border-white/40 bg-white/10' : 'border-white/10 bg-white/5'
+                } ${
+                  item.scrollTo || cmsEmbeds.length > 0 ? 'cursor-pointer' : ''
                 }`}
-                onClick={() => item.scrollTo && scrollToSection(item.scrollTo)}
+                onClick={() => {
+                  if (cmsEmbeds.length > 0) {
+                    setSelectedCategory(item.category);
+                    return;
+                  }
+                  if (item.scrollTo) scrollToSection(item.scrollTo);
+                }}
               >
-                <Icon className="w-12 h-12 mb-6 text-white/70" />
+                <Icon className={`w-12 h-12 mb-6 ${isActive ? 'text-white' : 'text-white/70'}`} />
                 <h3 className="text-xl mb-4">{item.title}</h3>
                 <p className="text-white/60 leading-relaxed">{item.description}</p>
               </div>
@@ -225,9 +242,13 @@ export function MusicProduction() {
 
         {cmsEmbeds.length > 0 ? (
           <div id="recent-releases" className="space-y-6">
-            {cmsEmbeds.map((item) => (
-              <CmsMusicItem key={item.id} item={item} />
-            ))}
+            {filteredCmsEmbeds.length > 0 ? (
+              filteredCmsEmbeds.map((item) => (
+                <CmsMusicItem key={item.id} item={item} />
+              ))
+            ) : (
+              <p className="text-white/60">No tracks in this category yet.</p>
+            )}
           </div>
         ) : (
           <>

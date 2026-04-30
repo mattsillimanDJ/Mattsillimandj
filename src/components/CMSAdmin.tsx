@@ -23,10 +23,13 @@ interface FeedItem {
   permalink: string;
 }
 
+type MusicCategory = 'originals' | 'remixes' | 'live';
+
 interface MusicItem {
   id: string;
   title: string;
   description: string;
+  category: MusicCategory;
   soundCloudUrl: string;
   embedCode: string;
 }
@@ -93,6 +96,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
       id: savedItems[index]?.id || `music-${index + 1}`,
       title: savedItems[index]?.title || '',
       description: savedItems[index]?.description || '',
+      category: savedItems[index]?.category || 'originals',
       soundCloudUrl: savedItems[index]?.soundCloudUrl || '',
       embedCode: savedItems[index]?.embedCode || '',
     }));
@@ -591,6 +595,20 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                           className="bg-zinc-800 border-zinc-700 text-white min-h-[90px]"
                           placeholder="Optional description"
                         />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`music-category-${index}`} className="text-white">Category</Label>
+                        <select
+                          id={`music-category-${index}`}
+                          value={item.category}
+                          onChange={(e) => updateMusicItem(index, 'category', e.target.value as MusicCategory)}
+                          className="w-full rounded-md bg-zinc-800 border border-zinc-700 px-3 py-2 text-white"
+                        >
+                          <option value="originals">Original Productions</option>
+                          <option value="remixes">Remixes & Edits</option>
+                          <option value="live">Live Mixes and DJ Sets</option>
+                        </select>
                       </div>
 
                       <div className="space-y-2">
