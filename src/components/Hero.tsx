@@ -5,8 +5,8 @@ import { normalizeCmsImages } from '../utils/cmsImages';
 export function Hero() {
   const [content, setContent] = useState({
     title: 'MATT SILLIMAN',
-    subtitle: 'Music Producer • DJ',
-    description: '',
+    subtitle: 'Atlanta House Music DJ & Producer',
+    description: 'Feelgood house, deep house, live mixes, and high-energy DJ sets for clubs, rooftops, venues, private events, and brand activations.',
   });
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
@@ -60,7 +60,7 @@ export function Hero() {
         <div className="absolute top-1/2 -translate-y-1/2 w-[48rem] h-[48rem] md:w-[60rem] md:h-[60rem] lg:w-[72rem] lg:h-[72rem] opacity-70 pointer-events-none" style={{ left: 'calc(50% - 5.5in)' }}>
           <img
             src={imageUrl}
-            alt={content.title}
+            alt="Matt Silliman, Atlanta house music DJ and producer"
             className="w-full h-full object-contain object-right"
           />
         </div>

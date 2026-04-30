@@ -158,14 +158,14 @@ export function MusicProduction() {
   const productions = [
     {
       title: 'Original Productions',
-      description: 'Creating unique tracks that push the boundaries of electronic music, from deep afro house to tech house.',
+      description: 'Feelgood house and deep house originals shaped for late nights, warm rooms, and dance floors with real momentum.',
       icon: Music,
       scrollTo: 'recent-releases',
       category: 'originals' as MusicCategory,
     },
     {
       title: 'Live Mixes and DJ Sets',
-      description: 'Recordings of live sets from all over the globe.',
+      description: 'High-energy live mixes and DJ sets for clubs, rooftops, venues, private events, and brand activations.',
       icon: Radio,
       scrollTo: 'live-mixes-sets',
       category: 'live' as MusicCategory,

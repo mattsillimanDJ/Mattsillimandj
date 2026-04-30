@@ -92,7 +92,7 @@ export function Contact() {
               {content.email}
             </a>
             <p className="mt-4 text-white/50">
-              For bookings, collaborations, or general inquiries.
+              For bookings, venues, private events, brand activations, rooftop sets, club nights, press, or music inquiries.
             </p>
           </div>
 
