@@ -92,7 +92,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
 
   const getMusicItems = () => {
     const savedItems = content.music?.items || [];
-    return Array.from({ length: 4 }, (_, index) => ({
+    return Array.from({ length: 8 }, (_, index) => ({
       id: savedItems[index]?.id || `music-${index + 1}`,
       title: savedItems[index]?.title || '',
       description: savedItems[index]?.description || '',
@@ -567,7 +567,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
             <Card className="bg-zinc-900 border-zinc-800">
               <CardHeader>
                 <CardTitle className="text-white">Music Embeds</CardTitle>
-                <CardDescription>Manage up to 4 Spotify, SoundCloud, YouTube, Mixcloud, or similar embeds</CardDescription>
+                <CardDescription>Manage up to 8 Spotify, SoundCloud, YouTube, Mixcloud, or similar embeds</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
