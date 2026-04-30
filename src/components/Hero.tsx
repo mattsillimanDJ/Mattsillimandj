@@ -5,7 +5,7 @@ import { normalizeCmsImages } from '../utils/cmsImages';
 export function Hero() {
   const [content, setContent] = useState({
     title: 'MATT SILLIMAN',
-    subtitle: 'Atlanta House Music DJ & Producer',
+    subtitle: 'House Music DJ & Producer',
     description: 'Feelgood house, deep house, live mixes, and high-energy DJ sets for clubs, rooftops, venues, private events, and brand activations.',
   });
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -73,11 +73,6 @@ export function Hero() {
         <p className="text-xl md:text-2xl text-white/60 tracking-widest uppercase">
           {content.subtitle}
         </p>
-        {content.description && (
-          <p className="mt-6 text-lg text-white/50 max-w-2xl mx-auto">
-            {content.description}
-          </p>
-        )}
       </div>
       
       <div className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce">
