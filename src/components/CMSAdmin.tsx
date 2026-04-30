@@ -23,7 +23,7 @@ interface FeedItem {
   permalink: string;
 }
 
-type MusicCategory = 'originals' | 'remixes' | 'live';
+type MusicCategory = 'originals' | 'live';
 
 interface MusicItem {
   id: string;
@@ -68,6 +68,10 @@ interface ImageData {
   contactBg?: string;
 }
 
+const normalizeMusicCategory = (category?: string): MusicCategory => (
+  category === 'live' ? 'live' : 'originals'
+);
+
 export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
   const [content, setContent] = useState<ContentData>({});
   const [images, setImages] = useState<ImageData>({});
@@ -96,7 +100,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
       id: savedItems[index]?.id || `music-${index + 1}`,
       title: savedItems[index]?.title || '',
       description: savedItems[index]?.description || '',
-      category: savedItems[index]?.category || 'originals',
+      category: normalizeMusicCategory(savedItems[index]?.category),
       soundCloudUrl: savedItems[index]?.soundCloudUrl || '',
       embedCode: savedItems[index]?.embedCode || '',
     }));
@@ -606,7 +610,6 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                           className="w-full rounded-md bg-zinc-800 border border-zinc-700 px-3 py-2 text-white"
                         >
                           <option value="originals">Original Productions</option>
-                          <option value="remixes">Remixes & Edits</option>
                           <option value="live">Live Mixes and DJ Sets</option>
                         </select>
                       </div>

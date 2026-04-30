@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { Music, Radio, Disc3 } from 'lucide-react';
+import { Music, Radio } from 'lucide-react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 
-type MusicCategory = 'originals' | 'remixes' | 'live';
+type MusicCategory = 'originals' | 'live';
 
 interface MusicItem {
   id: string;
@@ -143,13 +143,6 @@ export function MusicProduction() {
       category: 'originals' as MusicCategory,
     },
     {
-      title: 'Remixes & Edits',
-      description: 'Reimagining existing tracks with fresh energy and perspective.',
-      icon: Disc3,
-      scrollTo: 'remixes-edits',
-      category: 'remixes' as MusicCategory,
-    },
-    {
       title: 'Live Mixes and DJ Sets',
       description: 'Recordings of live sets from all over the globe.',
       icon: Radio,
@@ -181,13 +174,6 @@ export function MusicProduction() {
     },
   ];
 
-  const remixes = [
-    {
-      title: 'Droppin\' Bombs',
-      embedCode: '<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A2035208392&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>',
-    },
-  ];
-
   const liveMixes = [
     {
       title: 'Live from Wagyu House - feelgood set',
@@ -212,14 +198,14 @@ export function MusicProduction() {
       <div className="max-w-6xl mx-auto">
         <h2 className="text-5xl md:text-6xl mb-16 tracking-tight">Music Production</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
           {productions.map((item, index) => {
             const Icon = item.icon;
             const isActive = cmsEmbeds.length > 0 && selectedCategory === item.category;
             return (
               <div
                 key={index}
-                className={`border p-8 hover:bg-white/10 transition-all ${
+                className={`border p-8 min-h-[260px] h-full flex flex-col hover:bg-white/10 transition-all ${
                   isActive ? 'border-white/40 bg-white/10' : 'border-white/10 bg-white/5'
                 } ${
                   item.scrollTo || cmsEmbeds.length > 0 ? 'cursor-pointer' : ''
@@ -241,7 +227,7 @@ export function MusicProduction() {
         </div>
 
         {cmsEmbeds.length > 0 ? (
-          <div id="recent-releases" className="space-y-6">
+          <div id="recent-releases" className="max-w-3xl mx-auto space-y-6">
             {filteredCmsEmbeds.length > 0 ? (
               filteredCmsEmbeds.map((item) => (
                 <CmsMusicItem key={item.id} item={item} />
@@ -252,7 +238,7 @@ export function MusicProduction() {
           </div>
         ) : (
           <>
-        <div id="recent-releases" className="mb-24">
+        <div id="recent-releases" className="max-w-3xl mx-auto mb-24">
           <h3 className="text-3xl mb-12">Recent Releases</h3>
           <div className="space-y-6">
             {releases.map((release, index) => (
@@ -267,22 +253,7 @@ export function MusicProduction() {
           </div>
         </div>
 
-        <div id="remixes-edits" className="mb-24">
-          <h3 className="text-3xl mb-12">Remixes and Edits</h3>
-          <div className="space-y-6">
-            {remixes.map((remix, index) => (
-              <div
-                key={index}
-                className="border border-white/10 p-6 bg-white/5 hover:bg-white/10 transition-all"
-              >
-                <h4 className="text-xl mb-4">{remix.title}</h4>
-                <div dangerouslySetInnerHTML={{ __html: remix.embedCode }} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div id="live-mixes-sets">
+        <div id="live-mixes-sets" className="max-w-3xl mx-auto">
           <h3 className="text-3xl mb-12">Live Mixes and DJ Sets</h3>
           <div className="space-y-6">
             {liveMixes.map((liveMix, index) => (
