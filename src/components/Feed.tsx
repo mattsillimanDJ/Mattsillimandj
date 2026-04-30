@@ -16,6 +16,8 @@ export function Feed() {
   const [posts, setPosts] = useState<InstagramPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const instagramUrl = 'https://www.instagram.com/mattsilliman_dj/';
+  const visiblePosts = posts.slice(0, 12);
 
   useEffect(() => {
     async function fetchInstagramFeed() {
@@ -63,7 +65,7 @@ export function Feed() {
 
         <div className="text-center mb-8">
           <a
-            href="https://www.instagram.com/mattsilliman_dj/"
+            href={instagramUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-white/60 hover:text-white transition-colors"
@@ -81,38 +83,51 @@ export function Feed() {
 
         {error && (
           <div className="text-center py-20 max-w-2xl mx-auto">
-            <p className="text-red-500 mb-4">{error}</p>
-            <div className="text-white/60 text-sm space-y-4 text-left bg-white/5 p-6 rounded-lg border border-white/10">
-              <p className="font-semibold text-white/80">To connect your Instagram feed:</p>
-              <ol className="list-decimal list-inside space-y-2 ml-2">
-                <li>Go to <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">Meta for Developers</a></li>
-                <li>Create a new app or use an existing one</li>
-                <li>Add Instagram Basic Display product to your app</li>
-                <li>Create an Instagram Test User and accept the invite</li>
-                <li>Generate a User Token (this will be your access token)</li>
-                <li>Exchange the short-lived token for a long-lived token using:
-                  <code className="block mt-2 p-2 bg-black/50 text-xs overflow-x-auto">
-                    https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=YOUR_APP_SECRET&access_token=SHORT_LIVED_TOKEN
-                  </code>
-                </li>
-                <li>Copy the long-lived access token and paste it in your Supabase environment variables as INSTAGRAM_ACCESS_TOKEN</li>
-              </ol>
-              <p className="text-xs text-white/40 mt-4">
-                Note: Long-lived tokens expire after 60 days and need to be refreshed.
+            <div className="bg-white/5 p-8 rounded-lg border border-white/10">
+              <Instagram className="w-10 h-10 text-white/60 mx-auto mb-5" />
+              <h3 className="text-3xl tracking-tight mb-3">Follow Matt on Instagram</h3>
+              <p className="text-white/80 mb-4">@mattsilliman_dj</p>
+              <p className="text-white/60 mb-8">
+                Catch the latest shows, clips, releases, and behind-the-scenes moments.
               </p>
+              <a
+                href={instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 border border-white/20 px-6 py-3 text-sm uppercase tracking-wider text-white hover:bg-white hover:text-black transition-colors"
+              >
+                Open Instagram
+                <ExternalLink className="w-4 h-4" />
+              </a>
             </div>
           </div>
         )}
 
         {!loading && !error && posts.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-white/60">No posts found.</p>
+          <div className="text-center py-20 max-w-2xl mx-auto">
+            <div className="bg-white/5 p-8 rounded-lg border border-white/10">
+              <Instagram className="w-10 h-10 text-white/60 mx-auto mb-5" />
+              <h3 className="text-3xl tracking-tight mb-3">Follow Matt on Instagram</h3>
+              <p className="text-white/80 mb-4">@mattsilliman_dj</p>
+              <p className="text-white/60 mb-8">
+                Catch the latest shows, clips, releases, and behind-the-scenes moments.
+              </p>
+              <a
+                href={instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 border border-white/20 px-6 py-3 text-sm uppercase tracking-wider text-white hover:bg-white hover:text-black transition-colors"
+              >
+                Open Instagram
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            </div>
           </div>
         )}
 
-        {!loading && !error && posts.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {posts.map((post) => (
+        {!loading && !error && visiblePosts.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {visiblePosts.map((post) => (
               <a
                 key={post.id}
                 href={post.permalink}

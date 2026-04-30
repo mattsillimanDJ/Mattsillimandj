@@ -36,9 +36,9 @@ app.get("/make-server-80948ead/instagram-feed", async (c) => {
       return c.json({ error: 'Instagram API not configured' }, 500);
     }
 
-    // Fetch only the latest 9 posts from Instagram Graph API
+    // Fetch only the latest 12 posts from Instagram Graph API
     const response = await fetch(
-      `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=9&access_token=${accessToken}`
+      `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=12&access_token=${accessToken}`
     );
 
     if (!response.ok) {
