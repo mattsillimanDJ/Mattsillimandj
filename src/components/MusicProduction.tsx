@@ -1,6 +1,69 @@
+import { useEffect, useRef, useState } from 'react';
 import { Music, Radio, Disc3 } from 'lucide-react';
+import { projectId, publicAnonKey } from '../utils/supabase/info';
+
+interface MusicItem {
+  id: string;
+  title: string;
+  description?: string;
+  embedCode: string;
+}
+
+function MusicEmbed({ embedCode }: { embedCode: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Owner-controlled CMS embed code may include widget scripts from music services.
+    container.innerHTML = embedCode;
+    container.querySelectorAll('script').forEach((script) => {
+      const executableScript = document.createElement('script');
+      Array.from(script.attributes).forEach((attribute) => {
+        executableScript.setAttribute(attribute.name, attribute.value);
+      });
+      executableScript.text = script.text;
+      script.replaceWith(executableScript);
+    });
+
+    return () => {
+      container.innerHTML = '';
+    };
+  }, [embedCode]);
+
+  return <div ref={containerRef} className="music-embed w-full" />;
+}
 
 export function MusicProduction() {
+  const [cmsMusicItems, setCmsMusicItems] = useState<MusicItem[]>([]);
+  const cmsEmbeds = cmsMusicItems.filter((item) => item.embedCode.trim());
+
+  useEffect(() => {
+    async function fetchMusicItems() {
+      try {
+        const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-80948ead/cms/content`, {
+          headers: {
+            Authorization: `Bearer ${publicAnonKey}`,
+          },
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const musicContent = data.content?.find((item: any) => (
+          item.key === 'cms_content_music' || item.items?.some((musicItem: any) => musicItem.embedCode)
+        ));
+        const musicData = musicContent?.value || musicContent;
+        setCmsMusicItems(musicData?.items || []);
+      } catch (err) {
+        console.error('Error fetching music embeds:', err);
+      }
+    }
+
+    fetchMusicItems();
+  }, []);
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -102,6 +165,23 @@ export function MusicProduction() {
           })}
         </div>
 
+        {cmsEmbeds.length > 0 ? (
+          <div id="recent-releases" className="space-y-6">
+            {cmsEmbeds.map((item) => (
+              <div
+                key={item.id}
+                className="border border-white/10 p-6 bg-white/5 hover:bg-white/10 transition-all"
+              >
+                <h3 className="text-xl mb-3">{item.title || 'Music Embed'}</h3>
+                {item.description && (
+                  <p className="text-white/60 leading-relaxed mb-5">{item.description}</p>
+                )}
+                <MusicEmbed embedCode={item.embedCode} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <>
         <div id="recent-releases" className="mb-24">
           <h3 className="text-3xl mb-12">Recent Releases</h3>
           <div className="space-y-6">
@@ -146,6 +226,8 @@ export function MusicProduction() {
             ))}
           </div>
         </div>
+          </>
+        )}
       </div>
     </section>
   );

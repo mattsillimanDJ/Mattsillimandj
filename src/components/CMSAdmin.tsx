@@ -23,6 +23,13 @@ interface FeedItem {
   permalink: string;
 }
 
+interface MusicItem {
+  id: string;
+  title: string;
+  description: string;
+  embedCode: string;
+}
+
 interface ContentData {
   hero?: {
     title: string;
@@ -44,6 +51,9 @@ interface ContentData {
   feed?: {
     embedCode?: string;
     items: FeedItem[];
+  };
+  music?: {
+    items: MusicItem[];
   };
 }
 
@@ -73,6 +83,16 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
       imageUrl: savedItems[index]?.imageUrl || '',
       caption: savedItems[index]?.caption || '',
       permalink: savedItems[index]?.permalink || '',
+    }));
+  };
+
+  const getMusicItems = () => {
+    const savedItems = content.music?.items || [];
+    return Array.from({ length: 4 }, (_, index) => ({
+      id: savedItems[index]?.id || `music-${index + 1}`,
+      title: savedItems[index]?.title || '',
+      description: savedItems[index]?.description || '',
+      embedCode: savedItems[index]?.embedCode || '',
     }));
   };
 
@@ -247,6 +267,19 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
     }));
   };
 
+  const updateMusicItem = (index: number, field: keyof Omit<MusicItem, 'id'>, value: string) => {
+    const items = getMusicItems();
+    items[index] = {
+      ...items[index],
+      [field]: value,
+    };
+
+    setContent(prev => ({
+      ...prev,
+      music: { items },
+    }));
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -272,6 +305,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
             <TabsTrigger value="about">About</TabsTrigger>
             <TabsTrigger value="contact">Contact</TabsTrigger>
             <TabsTrigger value="feed">Feed</TabsTrigger>
+            <TabsTrigger value="music">Music</TabsTrigger>
             <TabsTrigger value="images">Images</TabsTrigger>
           </TabsList>
 
@@ -517,6 +551,63 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                 <Button onClick={() => saveContent('feed')} disabled={saving}>
                   <Save className="mr-2 h-4 w-4" />
                   {saving ? 'Saving...' : 'Save Feed Items'}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Music Section */}
+          <TabsContent value="music">
+            <Card className="bg-zinc-900 border-zinc-800">
+              <CardHeader>
+                <CardTitle className="text-white">Music Embeds</CardTitle>
+                <CardDescription>Manage up to 4 Spotify, SoundCloud, YouTube, Mixcloud, or similar embeds</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {getMusicItems().map((item, index) => (
+                    <div key={item.id} className="space-y-4 border border-zinc-800 rounded-lg p-4">
+                      <Label className="text-white">Music Item {index + 1}</Label>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`music-title-${index}`} className="text-white">Title</Label>
+                        <Input
+                          id={`music-title-${index}`}
+                          value={item.title}
+                          onChange={(e) => updateMusicItem(index, 'title', e.target.value)}
+                          className="bg-zinc-800 border-zinc-700 text-white"
+                          placeholder="Track, playlist, mix, or video title"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`music-description-${index}`} className="text-white">Description</Label>
+                        <Textarea
+                          id={`music-description-${index}`}
+                          value={item.description}
+                          onChange={(e) => updateMusicItem(index, 'description', e.target.value)}
+                          className="bg-zinc-800 border-zinc-700 text-white min-h-[90px]"
+                          placeholder="Optional description"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`music-embed-${index}`} className="text-white">Embed Code</Label>
+                        <Textarea
+                          id={`music-embed-${index}`}
+                          value={item.embedCode}
+                          onChange={(e) => updateMusicItem(index, 'embedCode', e.target.value)}
+                          className="bg-zinc-800 border-zinc-700 text-white min-h-[160px] font-mono text-sm"
+                          placeholder="<iframe ...></iframe>"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Button onClick={() => saveContent('music')} disabled={saving}>
+                  <Save className="mr-2 h-4 w-4" />
+                  {saving ? 'Saving...' : 'Save Music Embeds'}
                 </Button>
               </CardContent>
             </Card>
