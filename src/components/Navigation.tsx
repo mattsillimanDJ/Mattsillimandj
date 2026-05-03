@@ -32,15 +32,27 @@ export function Navigation({ activeSection }: NavigationProps) {
   }, []);
 
   const scrollToSection = (sectionId: string) => {
+    if (window.location.pathname !== '/') {
+      window.history.pushState({}, '', '/');
+      window.location.href = `/#${sectionId}`;
+      return;
+    }
+
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
+  const goToGallery = () => {
+    window.history.pushState({}, '', '/gallery');
+    window.location.href = '/gallery';
+  };
+
   const navItems = [
     { id: 'about', label: 'About' },
     { id: 'music-production', label: 'Production and Mixes' },
+    { id: 'gallery', label: 'Gallery', page: 'gallery' },
     { id: 'feed', label: 'Feed' },
     { id: 'contact', label: 'Contact' },
   ];
@@ -56,11 +68,11 @@ export function Navigation({ activeSection }: NavigationProps) {
             {logoUrl && <img src={logoUrl} alt="Matt Silliman Logo" className="h-24" />}
           </button>
           
-          <div className="flex gap-8">
+          <div className="flex gap-4 md:gap-8 flex-wrap justify-end">
             {navItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => scrollToSection(item.id)}
+                onClick={() => item.page === 'gallery' ? goToGallery() : scrollToSection(item.id)}
                 className={`uppercase text-sm tracking-wider transition-colors ${
                   activeSection === item.id
                     ? 'text-white'

@@ -24,6 +24,7 @@ interface FeedItem {
 }
 
 type MusicCategory = 'originals' | 'live';
+type GalleryCategory = 'live-sets' | 'behind-the-booth' | 'promo-press' | 'studio-lifestyle';
 
 interface MusicItem {
   id: string;
@@ -32,6 +33,34 @@ interface MusicItem {
   category: MusicCategory;
   soundCloudUrl: string;
   embedCode: string;
+}
+
+interface GalleryItem {
+  id: string;
+  imageUrl: string;
+  alt: string;
+  caption: string;
+  category: GalleryCategory;
+  sortOrder: number;
+  featured: boolean;
+  hidden: boolean;
+  date: string;
+  event: string;
+  photoCredit: string;
+}
+
+interface GalleryContent {
+  title: string;
+  intro: string;
+  heroImageUrl: string;
+  heroAlt: string;
+  seoTitle: string;
+  seoDescription: string;
+  ctaTitle: string;
+  ctaText: string;
+  ctaButtonLabel: string;
+  ctaButtonUrl: string;
+  items: GalleryItem[];
 }
 
 interface ContentData {
@@ -59,6 +88,7 @@ interface ContentData {
   music?: {
     items: MusicItem[];
   };
+  gallery?: GalleryContent;
 }
 
 interface ImageData {
@@ -70,6 +100,31 @@ interface ImageData {
 
 const normalizeMusicCategory = (category?: string): MusicCategory => (
   category === 'live' ? 'live' : 'originals'
+);
+
+const galleryCategories: Array<{ value: GalleryCategory; label: string }> = [
+  { value: 'live-sets', label: 'Live Sets' },
+  { value: 'behind-the-booth', label: 'Behind the Booth' },
+  { value: 'promo-press', label: 'Promo / Press' },
+  { value: 'studio-lifestyle', label: 'Studio / Lifestyle' },
+];
+
+const defaultGalleryContent: GalleryContent = {
+  title: 'Gallery',
+  intro: 'A visual look at live sets, late nights, press moments, and studio energy from Matt Silliman.',
+  heroImageUrl: '',
+  heroAlt: 'Matt Silliman DJ performance gallery',
+  seoTitle: 'Gallery | Matt Silliman DJ',
+  seoDescription: 'Explore Matt Silliman DJ photos from live sets, behind the booth, promo shoots, press, studio, and lifestyle moments.',
+  ctaTitle: 'Bring This Energy To Your Event',
+  ctaText: 'Book Matt Silliman for clubs, rooftops, brand activations, private events, and music-forward rooms.',
+  ctaButtonLabel: 'Book Matt',
+  ctaButtonUrl: '/#contact',
+  items: [],
+};
+
+const normalizeGalleryCategory = (category?: string): GalleryCategory => (
+  galleryCategories.some((item) => item.value === category) ? category as GalleryCategory : 'live-sets'
 );
 
 export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
@@ -103,6 +158,29 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
       category: normalizeMusicCategory(savedItems[index]?.category),
       soundCloudUrl: savedItems[index]?.soundCloudUrl || '',
       embedCode: savedItems[index]?.embedCode || '',
+    }));
+  };
+
+  const getGalleryContent = (): GalleryContent => ({
+    ...defaultGalleryContent,
+    ...content.gallery,
+    items: content.gallery?.items || [],
+  });
+
+  const getGalleryItems = () => {
+    const savedItems = getGalleryContent().items;
+    return Array.from({ length: Math.max(savedItems.length, 12) }, (_, index) => ({
+      id: savedItems[index]?.id || `gallery-${index + 1}`,
+      imageUrl: savedItems[index]?.imageUrl || '',
+      alt: savedItems[index]?.alt || '',
+      caption: savedItems[index]?.caption || '',
+      category: normalizeGalleryCategory(savedItems[index]?.category),
+      sortOrder: Number(savedItems[index]?.sortOrder ?? index + 1),
+      featured: Boolean(savedItems[index]?.featured),
+      hidden: Boolean(savedItems[index]?.hidden),
+      date: savedItems[index]?.date || '',
+      event: savedItems[index]?.event || '',
+      photoCredit: savedItems[index]?.photoCredit || '',
     }));
   };
 
@@ -290,6 +368,53 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
     }));
   };
 
+  const updateGalleryPage = (field: keyof Omit<GalleryContent, 'items'>, value: string) => {
+    setContent(prev => ({
+      ...prev,
+      gallery: {
+        ...defaultGalleryContent,
+        ...prev.gallery,
+        [field]: value,
+        items: prev.gallery?.items || [],
+      },
+    }));
+  };
+
+  const updateGalleryItem = (
+    index: number,
+    field: keyof Omit<GalleryItem, 'id'>,
+    value: string | number | boolean,
+  ) => {
+    const items = getGalleryItems();
+    items[index] = {
+      ...items[index],
+      [field]: value,
+    };
+
+    setContent(prev => ({
+      ...prev,
+      gallery: {
+        ...defaultGalleryContent,
+        ...prev.gallery,
+        items,
+      },
+    }));
+  };
+
+  const uploadGalleryHeroImage = async (file: File) => {
+    const imageUrl = await uploadImage('gallery-hero', file);
+    if (imageUrl) {
+      updateGalleryPage('heroImageUrl', imageUrl);
+    }
+  };
+
+  const uploadGalleryImage = async (index: number, file: File) => {
+    const imageUrl = await uploadImage(`gallery-${index + 1}`, file);
+    if (imageUrl) {
+      updateGalleryItem(index, 'imageUrl', imageUrl);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -297,6 +422,8 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
       </div>
     );
   }
+
+  const gallery = getGalleryContent();
 
   return (
     <div className="min-h-screen bg-black p-4">
@@ -316,6 +443,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
             <TabsTrigger value="contact">Contact</TabsTrigger>
             <TabsTrigger value="feed">Feed</TabsTrigger>
             <TabsTrigger value="music">Music</TabsTrigger>
+            <TabsTrigger value="gallery">Gallery</TabsTrigger>
             <TabsTrigger value="images">Images</TabsTrigger>
           </TabsList>
 
@@ -642,6 +770,281 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                 <Button onClick={() => saveContent('music')} disabled={saving}>
                   <Save className="mr-2 h-4 w-4" />
                   {saving ? 'Saving...' : 'Save Music Embeds'}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Gallery Section */}
+          <TabsContent value="gallery">
+            <Card className="bg-zinc-900 border-zinc-800">
+              <CardHeader>
+                <CardTitle className="text-white">Gallery Page</CardTitle>
+                <CardDescription>Manage the public /gallery page, SEO, CTA, and DJ photo grid</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="gallery-title" className="text-white">Page Title</Label>
+                    <Input
+                      id="gallery-title"
+                      value={gallery.title}
+                      onChange={(e) => updateGalleryPage('title', e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white"
+                      placeholder="Gallery"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="gallery-hero-alt" className="text-white">Hero Image Alt Text</Label>
+                    <Input
+                      id="gallery-hero-alt"
+                      value={gallery.heroAlt}
+                      onChange={(e) => updateGalleryPage('heroAlt', e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white"
+                      placeholder="Describe the hero image"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="gallery-intro" className="text-white">Intro</Label>
+                  <Textarea
+                    id="gallery-intro"
+                    value={gallery.intro}
+                    onChange={(e) => updateGalleryPage('intro', e.target.value)}
+                    className="bg-zinc-800 border-zinc-700 text-white min-h-[100px]"
+                    placeholder="Short gallery intro"
+                  />
+                </div>
+
+                <div className="space-y-3 border border-zinc-800 rounded-lg p-4">
+                  <Label className="text-white">Hero Image</Label>
+                  {gallery.heroImageUrl ? (
+                    <img src={gallery.heroImageUrl} alt={gallery.heroAlt || 'Gallery hero'} className="h-40 w-full object-cover rounded bg-zinc-800" />
+                  ) : (
+                    <div className="h-40 w-full rounded bg-zinc-800 flex items-center justify-center">
+                      <ImageIcon className="h-8 w-8 text-white/40" />
+                    </div>
+                  )}
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) uploadGalleryHeroImage(file);
+                    }}
+                    className="bg-zinc-800 border-zinc-700 text-white"
+                    disabled={uploading === 'gallery-hero'}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="gallery-seo-title" className="text-white">SEO Title</Label>
+                    <Input
+                      id="gallery-seo-title"
+                      value={gallery.seoTitle}
+                      onChange={(e) => updateGalleryPage('seoTitle', e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white"
+                      placeholder="Gallery | Matt Silliman DJ"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="gallery-seo-description" className="text-white">SEO Description</Label>
+                    <Textarea
+                      id="gallery-seo-description"
+                      value={gallery.seoDescription}
+                      onChange={(e) => updateGalleryPage('seoDescription', e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white min-h-[90px]"
+                      placeholder="Search result description"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border border-zinc-800 rounded-lg p-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="gallery-cta-title" className="text-white">CTA Title</Label>
+                    <Input
+                      id="gallery-cta-title"
+                      value={gallery.ctaTitle}
+                      onChange={(e) => updateGalleryPage('ctaTitle', e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white"
+                      placeholder="Bring This Energy To Your Event"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="gallery-cta-label" className="text-white">CTA Button Label</Label>
+                    <Input
+                      id="gallery-cta-label"
+                      value={gallery.ctaButtonLabel}
+                      onChange={(e) => updateGalleryPage('ctaButtonLabel', e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white"
+                      placeholder="Book Matt"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="gallery-cta-text" className="text-white">CTA Text</Label>
+                    <Textarea
+                      id="gallery-cta-text"
+                      value={gallery.ctaText}
+                      onChange={(e) => updateGalleryPage('ctaText', e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white min-h-[90px]"
+                      placeholder="Booking prompt"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="gallery-cta-url" className="text-white">CTA Button URL</Label>
+                    <Input
+                      id="gallery-cta-url"
+                      value={gallery.ctaButtonUrl}
+                      onChange={(e) => updateGalleryPage('ctaButtonUrl', e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white"
+                      placeholder="/#contact"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {getGalleryItems().map((item, index) => (
+                    <div key={item.id} className="space-y-4 border border-zinc-800 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-white">Gallery Image {index + 1}</Label>
+                        {uploading === `gallery-${index + 1}` && (
+                          <span className="text-sm text-white/60">Uploading...</span>
+                        )}
+                      </div>
+
+                      {item.imageUrl ? (
+                        <img src={item.imageUrl} alt={item.alt || `Gallery image ${index + 1}`} className="aspect-square w-full rounded object-cover bg-zinc-800" />
+                      ) : (
+                        <div className="aspect-square w-full rounded bg-zinc-800 flex items-center justify-center">
+                          <ImageIcon className="h-8 w-8 text-white/40" />
+                        </div>
+                      )}
+
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) uploadGalleryImage(index, file);
+                        }}
+                        className="bg-zinc-800 border-zinc-700 text-white"
+                        disabled={uploading === `gallery-${index + 1}`}
+                      />
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`gallery-alt-${index}`} className="text-white">Alt Text</Label>
+                        <Input
+                          id={`gallery-alt-${index}`}
+                          value={item.alt}
+                          onChange={(e) => updateGalleryItem(index, 'alt', e.target.value)}
+                          className="bg-zinc-800 border-zinc-700 text-white"
+                          placeholder="Describe the photo for accessibility"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`gallery-caption-${index}`} className="text-white">Caption</Label>
+                        <Textarea
+                          id={`gallery-caption-${index}`}
+                          value={item.caption}
+                          onChange={(e) => updateGalleryItem(index, 'caption', e.target.value)}
+                          className="bg-zinc-800 border-zinc-700 text-white min-h-[80px]"
+                          placeholder="Optional caption"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor={`gallery-category-${index}`} className="text-white">Category</Label>
+                          <select
+                            id={`gallery-category-${index}`}
+                            value={item.category}
+                            onChange={(e) => updateGalleryItem(index, 'category', e.target.value as GalleryCategory)}
+                            className="w-full rounded-md bg-zinc-800 border border-zinc-700 px-3 py-2 text-white"
+                          >
+                            {galleryCategories.map((category) => (
+                              <option key={category.value} value={category.value}>{category.label}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor={`gallery-order-${index}`} className="text-white">Sort Order</Label>
+                          <Input
+                            id={`gallery-order-${index}`}
+                            type="number"
+                            value={item.sortOrder}
+                            onChange={(e) => updateGalleryItem(index, 'sortOrder', Number(e.target.value))}
+                            className="bg-zinc-800 border-zinc-700 text-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <label className="flex items-center gap-2 text-white">
+                          <input
+                            type="checkbox"
+                            checked={item.featured}
+                            onChange={(e) => updateGalleryItem(index, 'featured', e.target.checked)}
+                          />
+                          Featured
+                        </label>
+                        <label className="flex items-center gap-2 text-white">
+                          <input
+                            type="checkbox"
+                            checked={item.hidden}
+                            onChange={(e) => updateGalleryItem(index, 'hidden', e.target.checked)}
+                          />
+                          Hidden / Unpublished
+                        </label>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor={`gallery-date-${index}`} className="text-white">Date</Label>
+                          <Input
+                            id={`gallery-date-${index}`}
+                            type="date"
+                            value={item.date}
+                            onChange={(e) => updateGalleryItem(index, 'date', e.target.value)}
+                            className="bg-zinc-800 border-zinc-700 text-white"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor={`gallery-event-${index}`} className="text-white">Event</Label>
+                          <Input
+                            id={`gallery-event-${index}`}
+                            value={item.event}
+                            onChange={(e) => updateGalleryItem(index, 'event', e.target.value)}
+                            className="bg-zinc-800 border-zinc-700 text-white"
+                            placeholder="Venue or event"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor={`gallery-credit-${index}`} className="text-white">Photo Credit</Label>
+                          <Input
+                            id={`gallery-credit-${index}`}
+                            value={item.photoCredit}
+                            onChange={(e) => updateGalleryItem(index, 'photoCredit', e.target.value)}
+                            className="bg-zinc-800 border-zinc-700 text-white"
+                            placeholder="Photographer"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Button onClick={() => saveContent('gallery')} disabled={saving}>
+                  <Save className="mr-2 h-4 w-4" />
+                  {saving ? 'Saving...' : 'Save Gallery Page'}
                 </Button>
               </CardContent>
             </Card>

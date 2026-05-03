@@ -125,6 +125,15 @@ export function Contact() {
           <p>&copy; 2025 Matt Silliman. All rights reserved.</p>
           <button
             onClick={() => {
+              window.history.pushState({}, '', '/gallery');
+              window.location.href = '/gallery';
+            }}
+            className="mt-2 mr-4 text-white/20 hover:text-white/40 transition-colors text-xs"
+          >
+            Gallery
+          </button>
+          <button
+            onClick={() => {
               window.history.pushState({}, '', '/cms');
               window.location.href = '/cms';
             }}

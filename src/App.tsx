@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { Suspense, lazy, useState, useEffect } from 'react';
 import { Navigation } from './components/Navigation';
 import { Hero } from './components/Hero';
 import { About } from './components/About';
@@ -7,27 +7,31 @@ import { Feed } from './components/Feed';
 import { Contact } from './components/Contact';
 import { CMS } from './components/CMS';
 
+const GalleryPage = lazy(() => (
+  import('./components/GalleryPage').then((module) => ({ default: module.GalleryPage }))
+));
+
 export default function App() {
   const [activeSection, setActiveSection] = useState('hero');
-  const [currentPage, setCurrentPage] = useState<'home' | 'cms'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'gallery' | 'cms'>('home');
 
   useEffect(() => {
-    // Check URL for /cms route
-    const path = window.location.pathname;
-    if (path === '/cms') {
-      setCurrentPage('cms');
-    } else {
-      setCurrentPage('home');
-    }
-
-    // Listen for popstate (back/forward navigation)
-    const handlePopState = () => {
+    const setPageFromPath = () => {
       const path = window.location.pathname;
-      setCurrentPage(path === '/cms' ? 'cms' : 'home');
+      if (path === '/cms') {
+        setCurrentPage('cms');
+      } else if (path === '/gallery') {
+        setCurrentPage('gallery');
+        setActiveSection('gallery');
+      } else {
+        setCurrentPage('home');
+      }
     };
 
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    setPageFromPath();
+
+    window.addEventListener('popstate', setPageFromPath);
+    return () => window.removeEventListener('popstate', setPageFromPath);
   }, []);
 
   useEffect(() => {
@@ -55,6 +59,17 @@ export default function App() {
 
   if (currentPage === 'cms') {
     return <CMS />;
+  }
+
+  if (currentPage === 'gallery') {
+    return (
+      <div className="bg-black text-white min-h-screen">
+        <Navigation activeSection="gallery" />
+        <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center">Loading gallery...</div>}>
+          <GalleryPage />
+        </Suspense>
+      </div>
+    );
   }
 
   return (
