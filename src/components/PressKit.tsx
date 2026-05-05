@@ -114,8 +114,8 @@ export function PressKit({ isPage = false }: PressKitProps) {
 
   return (
     <section id="press-kit" className="min-h-screen px-6 pt-36 pb-24 bg-neutral-950">
-      <div className="max-w-6xl mx-auto">
-        <div className="max-w-3xl mb-12">
+      <div className="max-w-7xl mx-auto">
+        <div className="max-w-3xl mb-16">
           <p className="text-sm uppercase tracking-widest text-white/40 mb-4">Press Kit</p>
           <h1 className="text-5xl md:text-7xl mb-6 tracking-tight">Press / EPK</h1>
           <p className="text-lg text-white/60 leading-relaxed">
@@ -123,24 +123,23 @@ export function PressKit({ isPage = false }: PressKitProps) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_22rem] gap-10 lg:items-start">
+        <div className="grid grid-cols-1 gap-16 xl:grid-cols-[minmax(0,1fr)_24rem] xl:items-start">
           <div className="max-w-3xl">
             <div>
-              <h2 className="text-2xl mb-5">Artist Bio</h2>
+              <h2 className="text-3xl md:text-4xl tracking-tight mb-7">Artist Bio</h2>
               <p className="text-lg text-white/70 leading-relaxed">
                 {shortBio}
               </p>
-              <p className="mt-6 text-white/60 leading-relaxed">
+              <p className="mt-10 text-lg text-white/60 leading-relaxed">
                 {longBio}
               </p>
             </div>
           </div>
 
-          <aside className="lg:sticky lg:top-36 space-y-4">
-            <div className="border-l border-white/15 pl-6">
-              <p className="text-xs uppercase tracking-widest text-white/40 mb-3">EPK</p>
-              <h2 className="text-3xl tracking-tight mb-4">Electronic Press Kit</h2>
-              <p className="text-sm text-white/60 leading-relaxed mb-6">
+          <aside className="pt-4 xl:sticky xl:top-36 xl:pt-0">
+            <div className="border-l border-white/15 pl-6 md:pl-8">
+              <h2 className="text-3xl md:text-4xl tracking-tight mb-5">Electronic Press Kit</h2>
+              <p className="text-base text-white/60 leading-relaxed mb-7">
                 Artist bio, photos, links, and booking info.
               </p>
               <a
@@ -161,7 +160,7 @@ export function PressKit({ isPage = false }: PressKitProps) {
               )}
             </div>
 
-            <div className="flex flex-wrap gap-x-5 gap-y-3 pl-6 text-xs uppercase tracking-widest text-white/55">
+            <div className="mt-10 flex flex-wrap gap-x-6 gap-y-3 pl-6 text-sm uppercase tracking-widest text-white/55 md:pl-8">
               <button
                 type="button"
                 onClick={() => scrollToSection('music-production')}
@@ -181,14 +180,14 @@ export function PressKit({ isPage = false }: PressKitProps) {
                 onClick={() => scrollToSection('contact')}
                 className="hover:text-white transition-colors"
               >
-                Book Matt
+                Contact
               </button>
             </div>
           </aside>
         </div>
 
-        <div className="mt-20 pt-10 border-t border-white/10">
-          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between mb-8">
+        <div className="mt-28 pt-12 border-t border-white/10">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between mb-10">
             <div>
               <p className="text-sm uppercase tracking-widest text-white/40 mb-3">Selected Press</p>
               <h2 className="text-3xl md:text-4xl tracking-tight">Press Links</h2>
@@ -198,26 +197,26 @@ export function PressKit({ isPage = false }: PressKitProps) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6">
             {pressLinks.map((link) => (
               <a
                 key={link.url}
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group border-t border-white/15 pt-5 transition-colors hover:border-white/45"
+                className="group border-t border-white/15 pt-6 transition-colors hover:border-white/45"
               >
                 <span className="mb-5 flex items-start justify-between gap-4">
                   <span className="text-xs uppercase tracking-widest text-white/40">{link.label}</span>
                   <ArrowUpRight className="w-4 h-4 text-white/45 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white/80" />
                 </span>
-                <span className="text-xl tracking-tight text-white/85">{link.title}</span>
+                <span className="text-xl md:text-2xl tracking-tight text-white/85">{link.title}</span>
               </a>
             ))}
           </div>
         </div>
 
-        <div className="mt-20 border-t border-white/10 pt-10 md:flex md:items-center md:justify-between md:gap-8">
+        <div className="mt-28 border-t border-white/10 pt-12 md:flex md:items-center md:justify-between md:gap-10">
           <p className="max-w-2xl text-xl md:text-2xl text-white/75 leading-relaxed">
             For bookings, brand activations, private events, and media inquiries, get in touch.
           </p>
