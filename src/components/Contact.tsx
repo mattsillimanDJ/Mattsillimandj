@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
-import { Mail, Instagram, Music2, Facebook, Video } from 'lucide-react';
+import type { MouseEvent } from 'react';
+import { ArrowUpRight, FileText, Instagram, Mail, Music2, Facebook, Video } from 'lucide-react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { normalizeCmsImages } from '../utils/cmsImages';
+import { EPK_PDF_URL, pressLinks } from './pressKitContent';
 
 function normalizeContactContent<T extends { title?: string }>(raw: T): T {
-  if (raw.title !== ['Get', 'In', 'Touch'].join(' ')) return raw;
-
   return {
     ...raw,
-    title: 'Booking & Contact',
+    title: 'Booking, Contact, Press & Socials',
   };
 }
 
 export function Contact() {
   const [content, setContent] = useState({
-    title: 'Booking & Contact',
+    title: 'Booking, Contact, Press & Socials',
     email: 'mattsilliman@gmail.com',
     instagram: '@mattsilliman_dj',
     soundcloud: 'mattsilliman',
@@ -71,6 +71,10 @@ export function Contact() {
     { icon: Video, label: 'TikTok', handle: content.tiktok, url: content.tiktok.startsWith('http') ? content.tiktok : `https://www.tiktok.com/@${content.tiktok.replace('@', '')}` },
   ];
 
+  const handleEpkClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (EPK_PDF_URL === '#') event.preventDefault();
+  };
+
   return (
     <section id="contact" className="min-h-screen flex items-center py-24 px-6 relative overflow-hidden">
       {/* Background Image */}
@@ -92,7 +96,7 @@ export function Contact() {
           <div className="border border-white/10 p-8 bg-white/5 backdrop-blur-sm">
             <div className="flex items-center gap-4 mb-4">
               <Mail className="w-6 h-6 text-white/70" />
-              <h3 className="text-2xl">Email</h3>
+              <h3 className="text-2xl">Email / Booking</h3>
             </div>
             <a 
               href={`mailto:${content.email}`} 
@@ -101,12 +105,53 @@ export function Contact() {
               {content.email}
             </a>
             <p className="mt-4 text-white/50">
-              Booking clubs, rooftops, private events, venues, brand activations, and music-forward rooms that need deep, soulful, high-energy house.
+              For bookings, clubs, rooftops, private events, venues, brand activations, and media inquiries.
             </p>
           </div>
 
           <div className="border border-white/10 p-8 bg-white/5 backdrop-blur-sm">
-            <h3 className="text-2xl mb-6">Connect</h3>
+            <div className="flex items-center gap-4 mb-4">
+              <FileText className="w-6 h-6 text-white/70" />
+              <h3 className="text-2xl">Press / EPK</h3>
+            </div>
+            <p className="text-white/50">
+              Artist bio, selected press, visuals, music links, and booking contact.
+            </p>
+            <a
+              href={EPK_PDF_URL}
+              onClick={handleEpkClick}
+              aria-disabled={EPK_PDF_URL === '#'}
+              className="mt-6 inline-flex items-center gap-2 border-b border-white/40 pb-1 text-sm uppercase tracking-widest text-white transition-colors hover:border-white/20 hover:text-white/60"
+            >
+              View / Download EPK
+              <ArrowUpRight className="w-4 h-4" />
+            </a>
+            {EPK_PDF_URL === '#' && (
+              <p className="mt-3 text-xs text-white/35">
+                EPK link coming soon.
+              </p>
+            )}
+            <div className="mt-7 flex flex-col gap-4 border-t border-white/10 pt-6">
+              {pressLinks.map((link) => (
+                <a
+                  key={link.url}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center justify-between gap-4 text-white/60 hover:text-white transition-colors"
+                >
+                  <span>
+                    <span className="text-white/80 group-hover:text-white">{link.title}</span>
+                    <span className="text-white/35"> &mdash; {link.label}</span>
+                  </span>
+                  <ArrowUpRight className="h-4 w-4 shrink-0 text-white/35 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white/70" />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div className="border border-white/10 p-8 bg-white/5 backdrop-blur-sm">
+            <h3 className="text-2xl mb-6">Connect / Socials</h3>
             <div className="space-y-4">
               {socialLinks.map((link, index) => {
                 const Icon = link.icon;

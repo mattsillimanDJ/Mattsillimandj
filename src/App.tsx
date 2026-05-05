@@ -44,7 +44,7 @@ export default function App() {
     if (currentPage !== 'home') return;
 
     const handleScroll = () => {
-      const sections = ['hero', 'about', 'music-production', 'feed', 'press-kit', 'contact'];
+      const sections = ['hero', 'about', 'music-production', 'feed', 'contact'];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
@@ -96,9 +96,6 @@ export default function App() {
       <About />
       <MusicProduction />
       <Feed />
-      <Suspense fallback={null}>
-        <PressKit />
-      </Suspense>
       <Contact />
     </div>
   );
