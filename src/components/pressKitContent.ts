@@ -1,4 +1,4 @@
-export const EPK_PDF_URL = '#';
+export const EPK_PDF_URL = 'https://drive.google.com/file/d/1KikpjO_5Tys4xVSZt0h8lEI7k-aoDQVQ/view?usp=drive_link';
 
 export const pressLinks = [
   {
