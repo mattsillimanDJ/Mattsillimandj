@@ -93,32 +93,6 @@ export function Hero() {
         <p className="max-w-2xl mx-auto mt-6 text-lg md:text-xl text-white/70 leading-relaxed">
           {content.description}
         </p>
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-          <button
-            type="button"
-            onClick={() => document.getElementById('music-production')?.scrollIntoView({ behavior: 'smooth' })}
-            className="min-w-32 px-7 py-3.5 border border-white/70 bg-white text-black uppercase text-sm tracking-wider hover:bg-white/90 transition-colors"
-          >
-            Listen
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              window.history.pushState({}, '', '/gallery');
-              window.location.href = '/gallery';
-            }}
-            className="min-w-32 px-7 py-3.5 border border-white/30 text-white uppercase text-sm tracking-wider hover:border-white/70 hover:bg-white/10 transition-colors"
-          >
-            View Gallery
-          </button>
-          <button
-            type="button"
-            onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-            className="min-w-32 px-7 py-3.5 border border-white/30 text-white uppercase text-sm tracking-wider hover:border-white/70 hover:bg-white/10 transition-colors"
-          >
-            Book Matt
-          </button>
-        </div>
       </div>
       
       <div className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce">

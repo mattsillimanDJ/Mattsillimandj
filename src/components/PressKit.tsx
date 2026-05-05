@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { ArrowUpRight, Download, Images, Mail, Music2 } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 
 interface PressKitProps {
   isPage?: boolean;
@@ -27,7 +27,7 @@ const pressLinks = [
 
 const shortBio = 'Matt Silliman is a feelgood house music DJ and producer blending deep, soulful grooves, vocal moments, and high-energy house into sets built for clubs, rooftops, private events, venues, and brand activations.';
 
-const longBio = 'Matt Silliman came up in the Atlanta rave and house scene, building a sound rooted in deep, soulful, feelgood house with enough drive to move bigger rooms. His sets blend deep house, melodic grooves, vocal moments, and high-energy tech house into a warm, music-forward experience built for rooftops, clubs, private events, and brand activations.';
+const longBio = 'Coming up through Atlanta\'s rave and house scene gave Matt a foundation in rooms where groove, energy, and community matter. That origin still shapes a sound that travels well beyond one city: deep house, melodic grooves, vocal moments, and high-energy tech house shaped into a warm, music-forward experience for rooftops, clubs, private events, venues, and brand activations.';
 
 function setMetaTag(selector: string, attribute: 'content' | 'href', value: string) {
   const element = document.querySelector(selector);
@@ -79,15 +79,15 @@ export function PressKit({ isPage = false }: PressKitProps) {
             <p className="text-sm uppercase tracking-widest text-white/40 mb-4">Press / EPK</p>
             <h2 className="text-4xl md:text-5xl mb-5 tracking-tight">Press / EPK</h2>
             <p className="text-base md:text-lg text-white/60 leading-relaxed">
-              Artist bio, selected press, visuals, music links, and booking contact for promoters, venues, brands, and press.
+              Artist bio, selected press, visuals, music links, and booking contact.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm uppercase tracking-widest">
             <button
               type="button"
               onClick={goToPress}
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-black uppercase text-xs tracking-wider hover:bg-white/90 transition-colors"
+              className="inline-flex items-center gap-2 text-white hover:text-white/60 transition-colors"
             >
               View Press Kit
               <ArrowUpRight className="w-4 h-4" />
@@ -95,16 +95,16 @@ export function PressKit({ isPage = false }: PressKitProps) {
             <button
               type="button"
               onClick={goToGallery}
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 border border-white/20 text-white uppercase text-xs tracking-wider hover:border-white/60 hover:bg-white/10 transition-colors"
+              className="text-white/70 hover:text-white transition-colors"
             >
               Gallery
             </button>
             <button
               type="button"
               onClick={() => scrollToSection('contact')}
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 border border-white/20 text-white uppercase text-xs tracking-wider hover:border-white/60 hover:bg-white/10 transition-colors"
+              className="text-white/70 hover:text-white transition-colors"
             >
-              Book Matt
+              Contact
             </button>
           </div>
         </div>
@@ -119,45 +119,36 @@ export function PressKit({ isPage = false }: PressKitProps) {
           <p className="text-sm uppercase tracking-widest text-white/40 mb-4">Press Kit</p>
           <h1 className="text-5xl md:text-7xl mb-6 tracking-tight">Press / EPK</h1>
           <p className="text-lg text-white/60 leading-relaxed">
-            Bios, music, visuals, and booking contact for promoters, venues, private clients, brand teams, and press.
+            Artist bio, selected press, music, visuals, and booking contact for promoters, venues, brands, and media.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_22rem] gap-10 lg:items-start">
-          <div className="max-w-3xl space-y-9">
+          <div className="max-w-3xl">
             <div>
-              <h2 className="text-2xl mb-4">Short Bio</h2>
+              <h2 className="text-2xl mb-5">Artist Bio</h2>
               <p className="text-lg text-white/70 leading-relaxed">
                 {shortBio}
               </p>
-            </div>
-
-            <div className="pt-8 border-t border-white/10">
-              <h2 className="text-2xl mb-4">Long Bio</h2>
-              <p className="text-white/60 leading-relaxed">
+              <p className="mt-6 text-white/60 leading-relaxed">
                 {longBio}
               </p>
             </div>
           </div>
 
           <aside className="lg:sticky lg:top-36 space-y-4">
-            <div className="border border-white/10 bg-white/[0.04] p-6">
-              <div className="flex items-start justify-between gap-4 mb-5">
-                <div>
-                  <p className="text-xs uppercase tracking-widest text-white/40 mb-2">Download</p>
-                  <h2 className="text-3xl tracking-tight">EPK</h2>
-                </div>
-                <Download className="w-5 h-5 text-white/50" />
-              </div>
+            <div className="border-l border-white/15 pl-6">
+              <p className="text-xs uppercase tracking-widest text-white/40 mb-3">EPK</p>
+              <h2 className="text-3xl tracking-tight mb-4">Electronic Press Kit</h2>
               <p className="text-sm text-white/60 leading-relaxed mb-6">
-                Download the latest artist bio, photos, links, and booking info.
+                Artist bio, photos, links, and booking info.
               </p>
               <a
                 href={EPK_PDF_URL}
                 onClick={(event) => {
                   if (EPK_PDF_URL === '#') event.preventDefault();
                 }}
-                className="flex w-full items-center justify-center gap-2 px-5 py-3 bg-white text-black uppercase text-xs tracking-wider hover:bg-white/90 transition-colors"
+                className="inline-flex items-center gap-2 border-b border-white/40 pb-1 text-sm uppercase tracking-widest text-white hover:text-white/60 hover:border-white/20 transition-colors"
                 aria-disabled={EPK_PDF_URL === '#'}
               >
                 View / Download EPK
@@ -170,39 +161,27 @@ export function PressKit({ isPage = false }: PressKitProps) {
               )}
             </div>
 
-            <div className="grid gap-3">
+            <div className="flex flex-wrap gap-x-5 gap-y-3 pl-6 text-xs uppercase tracking-widest text-white/55">
               <button
                 type="button"
                 onClick={() => scrollToSection('music-production')}
-                className="flex items-center justify-between gap-4 px-5 py-4 border border-white/10 bg-white/[0.03] text-left hover:border-white/40 hover:bg-white/10 transition-colors"
+                className="hover:text-white transition-colors"
               >
-                <span className="flex items-center gap-3 text-sm uppercase tracking-wider">
-                  <Music2 className="w-4 h-4 text-white/60" />
-                  Listen
-                </span>
-                <ArrowUpRight className="w-4 h-4 text-white/45" />
+                Listen
               </button>
               <button
                 type="button"
                 onClick={goToGallery}
-                className="flex items-center justify-between gap-4 px-5 py-4 border border-white/10 bg-white/[0.03] text-left hover:border-white/40 hover:bg-white/10 transition-colors"
+                className="hover:text-white transition-colors"
               >
-                <span className="flex items-center gap-3 text-sm uppercase tracking-wider">
-                  <Images className="w-4 h-4 text-white/60" />
-                  Gallery
-                </span>
-                <ArrowUpRight className="w-4 h-4 text-white/45" />
+                Gallery
               </button>
               <button
                 type="button"
                 onClick={() => scrollToSection('contact')}
-                className="flex items-center justify-between gap-4 px-5 py-4 border border-white/10 bg-white/[0.03] text-left hover:border-white/40 hover:bg-white/10 transition-colors"
+                className="hover:text-white transition-colors"
               >
-                <span className="flex items-center gap-3 text-sm uppercase tracking-wider">
-                  <Mail className="w-4 h-4 text-white/60" />
-                  Book Matt
-                </span>
-                <ArrowUpRight className="w-4 h-4 text-white/45" />
+                Book Matt
               </button>
             </div>
           </aside>
@@ -226,9 +205,9 @@ export function PressKit({ isPage = false }: PressKitProps) {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group min-h-36 flex flex-col justify-between gap-8 border border-white/10 bg-white/[0.03] p-5 hover:border-white/40 hover:bg-white/10 transition-colors"
+                className="group border-t border-white/15 pt-5 transition-colors hover:border-white/45"
               >
-                <span className="flex items-start justify-between gap-4">
+                <span className="mb-5 flex items-start justify-between gap-4">
                   <span className="text-xs uppercase tracking-widest text-white/40">{link.label}</span>
                   <ArrowUpRight className="w-4 h-4 text-white/45 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white/80" />
                 </span>
@@ -236,6 +215,20 @@ export function PressKit({ isPage = false }: PressKitProps) {
               </a>
             ))}
           </div>
+        </div>
+
+        <div className="mt-20 border-t border-white/10 pt-10 md:flex md:items-center md:justify-between md:gap-8">
+          <p className="max-w-2xl text-xl md:text-2xl text-white/75 leading-relaxed">
+            For bookings, brand activations, private events, and media inquiries, get in touch.
+          </p>
+          <button
+            type="button"
+            onClick={() => scrollToSection('contact')}
+            className="mt-6 inline-flex items-center gap-2 border-b border-white/40 pb-1 text-sm uppercase tracking-widest text-white hover:text-white/60 hover:border-white/20 transition-colors md:mt-0"
+          >
+            Book / Contact Matt
+            <ArrowUpRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </section>
