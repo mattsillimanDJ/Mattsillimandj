@@ -2,10 +2,20 @@ import { useState, useEffect } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { normalizeCmsImages } from '../utils/cmsImages';
 
+function normalizeAboutContent(raw: { title: string; content: string }) {
+  return {
+    ...raw,
+    content: raw.content.replace(
+      /Matt Silliman is an Atlanta[- ]based house music DJ and producer creating feelgood house, deep house, original productions, and live mixes built around energy, connection, and a great room\. His sets are clean, high-energy, and good-vibes forward, shaped for clubs, rooftops, venues, private events, and brand activations\./,
+      'Matt Silliman is a feelgood house music DJ and producer creating deep, soulful, high-energy house for clubs, rooftops, private events, venues, brand activations, and music-forward rooms. Atlanta-born and built for rooms that want to move, his sets are warm, polished, and rooted in connection.'
+    ),
+  };
+}
+
 export function About() {
   const [content, setContent] = useState({
     title: 'About Matt Silliman',
-    content: `Matt Silliman is an Atlanta-based house music DJ and producer creating feelgood house, deep house, original productions, and live mixes built around energy, connection, and a great room. His sets are clean, high-energy, and good-vibes forward, shaped for clubs, rooftops, venues, private events, and brand activations.
+    content: `Matt Silliman is a feelgood house music DJ and producer creating deep, soulful, high-energy house for clubs, rooftops, private events, venues, brand activations, and music-forward rooms. Atlanta-born and built for rooms that want to move, his sets are warm, polished, and rooted in connection.
 
 Originally emerging from the Atlanta scene under the moniker "Starboy," Matt spent years cutting his teeth in underground rooms, learning how to move a crowd before moving a career. That early foundation shaped his approach today. He is not just playing tracks, he is building an arc, reading the room, and creating moments that people remember long after the lights come up.
 
@@ -31,7 +41,7 @@ At his core, Matt Silliman is driven by one simple idea. Music should make peopl
         const data = await response.json();
         const aboutContent = data.content.find((item: any) => item.key === 'cms_content_about');
         if (aboutContent) {
-          setContent(aboutContent.value);
+          setContent(normalizeAboutContent(aboutContent.value));
         }
       } catch (err) {
         console.error('Failed to load about content:', err);

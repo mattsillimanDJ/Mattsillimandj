@@ -3,9 +3,18 @@ import { Mail, Instagram, Music2, Facebook, Video } from 'lucide-react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { normalizeCmsImages } from '../utils/cmsImages';
 
+function normalizeContactContent<T extends { title?: string }>(raw: T): T {
+  if (raw.title !== ['Get', 'In', 'Touch'].join(' ')) return raw;
+
+  return {
+    ...raw,
+    title: 'Booking & Contact',
+  };
+}
+
 export function Contact() {
   const [content, setContent] = useState({
-    title: 'Get In Touch',
+    title: 'Booking & Contact',
     email: 'mattsilliman@gmail.com',
     instagram: '@mattsilliman_dj',
     soundcloud: 'mattsilliman',
@@ -26,7 +35,7 @@ export function Contact() {
         const data = await response.json();
         const contactContent = data.content.find((item: any) => item.key === 'cms_content_contact');
         if (contactContent) {
-          setContent(contactContent.value);
+          setContent(normalizeContactContent(contactContent.value));
         }
       } catch (err) {
         console.error('Failed to load contact content:', err);
@@ -92,7 +101,7 @@ export function Contact() {
               {content.email}
             </a>
             <p className="mt-4 text-white/50">
-              For bookings, venues, private events, brand activations, rooftop sets, club nights, press, or music inquiries.
+              Booking clubs, rooftops, private events, venues, brand activations, and music-forward rooms that need deep, soulful, high-energy house.
             </p>
           </div>
 
@@ -131,6 +140,15 @@ export function Contact() {
             className="mt-2 mr-4 text-white/20 hover:text-white/40 transition-colors text-xs"
           >
             Gallery
+          </button>
+          <button
+            onClick={() => {
+              window.history.pushState({}, '', '/press');
+              window.location.href = '/press';
+            }}
+            className="mt-2 mr-4 text-white/20 hover:text-white/40 transition-colors text-xs"
+          >
+            Press Kit
           </button>
           <button
             onClick={() => {

@@ -35,13 +35,13 @@ interface GalleryContent {
 
 const defaultGallery: GalleryContent = {
   title: 'Gallery',
-  intro: 'A visual look at live sets, late nights, press moments, and studio energy from Matt Silliman.',
+  intro: 'Live sets, crowd moments, behind-the-booth shots, and visual proof of the room moving.',
   heroImageUrl: '',
   heroAlt: 'Matt Silliman DJ performance gallery',
   seoTitle: 'Gallery | Matt Silliman DJ',
-  seoDescription: 'Explore Matt Silliman DJ photos from live sets, behind the booth, promo shoots, press, studio, and lifestyle moments.',
+  seoDescription: 'Explore Matt Silliman DJ photos from live sets, crowd moments, behind-the-booth shots, press images, and visual proof of the room moving.',
   ctaTitle: 'Bring This Energy To Your Event',
-  ctaText: 'Book Matt Silliman for clubs, rooftops, brand activations, private events, and music-forward rooms.',
+  ctaText: 'Book Matt Silliman for clubs, rooftops, private events, venues, brand activations, and music-forward rooms.',
   ctaButtonLabel: 'Book Matt',
   ctaButtonUrl: '/#contact',
   items: [],
@@ -70,11 +70,29 @@ function setMetaTag(selector: string, attribute: 'content' | 'href', value: stri
 }
 
 function normalizeGallery(raw: Partial<GalleryContent> | undefined): GalleryContent {
-  return {
+  const gallery = {
     ...defaultGallery,
     ...raw,
     items: Array.isArray(raw?.items) ? raw.items : [],
   };
+
+  if (/atlanta\s+house\s+music\s+dj|atlanta\s+dj/i.test(gallery.seoTitle || '')) {
+    gallery.seoTitle = defaultGallery.seoTitle;
+  }
+
+  if (/atlanta\s+house\s+music\s+dj|atlanta\s+dj/i.test(gallery.seoDescription || '')) {
+    gallery.seoDescription = defaultGallery.seoDescription;
+  }
+
+  if (gallery.intro === 'A visual look at live sets, late nights, press moments, and studio energy from Matt Silliman.') {
+    gallery.intro = defaultGallery.intro;
+  }
+
+  if (gallery.ctaText === 'Book Matt Silliman for clubs, rooftops, brand activations, private events, and music-forward rooms.') {
+    gallery.ctaText = defaultGallery.ctaText;
+  }
+
+  return gallery;
 }
 
 function getCmsValue(item: any) {
@@ -127,8 +145,8 @@ export function GalleryPage() {
     setMetaTag('meta[name="twitter:description"]', 'content', gallery.seoDescription || defaultGallery.seoDescription);
 
     return () => {
-      document.title = 'Matt Silliman | Atlanta House Music DJ & Producer';
-      setMetaTag('meta[name="description"]', 'content', 'Atlanta house music DJ and producer Matt Silliman brings feelgood house, deep house, original productions, live mixes, and high-energy sets to clubs, rooftops, private events, brand activations, and venues.');
+      document.title = 'Matt Silliman | Feelgood House Music DJ & Producer';
+      setMetaTag('meta[name="description"]', 'content', 'Feelgood house music DJ and producer Matt Silliman brings deep, soulful, high-energy house music to clubs, rooftops, private events, venues, and brand activations.');
       setMetaTag('link[rel="canonical"]', 'href', 'https://www.mattsillimandj.com/');
     };
   }, [gallery.seoDescription, gallery.seoTitle]);

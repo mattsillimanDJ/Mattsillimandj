@@ -2,12 +2,29 @@ import { useState, useEffect } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { normalizeCmsImages } from '../utils/cmsImages';
 
+const defaultHeroContent = {
+  title: 'MATT SILLIMAN',
+  subtitle: 'Feelgood house for rooms that want to move.',
+  description: 'Deep, soulful, high-energy house music for clubs, rooftops, private events, venues, and brand activations.',
+};
+
+function normalizeHeroContent(raw: Partial<typeof defaultHeroContent> | undefined) {
+  const next = { ...defaultHeroContent, ...raw };
+  const localOnlyPositioning = /atlanta\s+house\s+music\s+dj|atlanta\s+dj/i;
+
+  if (localOnlyPositioning.test(next.subtitle || '')) {
+    next.subtitle = defaultHeroContent.subtitle;
+  }
+
+  if (localOnlyPositioning.test(next.description || '')) {
+    next.description = defaultHeroContent.description;
+  }
+
+  return next;
+}
+
 export function Hero() {
-  const [content, setContent] = useState({
-    title: 'MATT SILLIMAN',
-    subtitle: 'House Music DJ & Producer',
-    description: 'Feelgood house, deep house, live mixes, and high-energy DJ sets for clubs, rooftops, venues, private events, and brand activations.',
-  });
+  const [content, setContent] = useState(defaultHeroContent);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -22,7 +39,7 @@ export function Hero() {
         const data = await response.json();
         const heroContent = data.content.find((item: any) => item.key === 'cms_content_hero');
         if (heroContent) {
-          setContent(heroContent.value);
+          setContent(normalizeHeroContent(heroContent.value));
         }
       } catch (err) {
         console.error('Failed to load hero content:', err);
@@ -60,7 +77,7 @@ export function Hero() {
         <div className="absolute top-1/2 -translate-y-1/2 w-[48rem] h-[48rem] md:w-[60rem] md:h-[60rem] lg:w-[72rem] lg:h-[72rem] opacity-70 pointer-events-none" style={{ left: 'calc(50% - 5.5in)' }}>
           <img
             src={imageUrl}
-            alt="Matt Silliman, Atlanta house music DJ and producer"
+            alt="Matt Silliman, feelgood house music DJ and producer"
             className="w-full h-full object-contain object-right"
           />
         </div>
@@ -73,6 +90,35 @@ export function Hero() {
         <p className="text-xl md:text-2xl text-white/60 tracking-widest uppercase">
           {content.subtitle}
         </p>
+        <p className="max-w-2xl mx-auto mt-6 text-lg md:text-xl text-white/70 leading-relaxed">
+          {content.description}
+        </p>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <button
+            type="button"
+            onClick={() => document.getElementById('music-production')?.scrollIntoView({ behavior: 'smooth' })}
+            className="px-6 py-3 border border-white/70 bg-white text-black uppercase text-sm tracking-wider hover:bg-white/90 transition-colors"
+          >
+            Listen
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              window.history.pushState({}, '', '/gallery');
+              window.location.href = '/gallery';
+            }}
+            className="px-6 py-3 border border-white/30 text-white uppercase text-sm tracking-wider hover:border-white/70 hover:bg-white/10 transition-colors"
+          >
+            View Gallery
+          </button>
+          <button
+            type="button"
+            onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+            className="px-6 py-3 border border-white/30 text-white uppercase text-sm tracking-wider hover:border-white/70 hover:bg-white/10 transition-colors"
+          >
+            Book Matt
+          </button>
+        </div>
       </div>
       
       <div className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce">

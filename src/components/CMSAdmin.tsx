@@ -23,7 +23,7 @@ interface FeedItem {
   permalink: string;
 }
 
-type MusicCategory = 'originals' | 'live';
+type MusicCategory = 'originals' | 'live' | 'deep';
 type GalleryCategory = 'live-sets' | 'behind-the-booth' | 'promo-press' | 'studio-lifestyle';
 
 interface MusicItem {
@@ -99,7 +99,7 @@ interface ImageData {
 }
 
 const normalizeMusicCategory = (category?: string): MusicCategory => (
-  category === 'live' ? 'live' : 'originals'
+  category === 'live' || category === 'deep' ? category : 'originals'
 );
 
 const galleryCategories: Array<{ value: GalleryCategory; label: string }> = [
@@ -111,13 +111,13 @@ const galleryCategories: Array<{ value: GalleryCategory; label: string }> = [
 
 const defaultGalleryContent: GalleryContent = {
   title: 'Gallery',
-  intro: 'A visual look at live sets, late nights, press moments, and studio energy from Matt Silliman.',
+  intro: 'Live sets, crowd moments, behind-the-booth shots, and visual proof of the room moving.',
   heroImageUrl: '',
   heroAlt: 'Matt Silliman DJ performance gallery',
   seoTitle: 'Gallery | Matt Silliman DJ',
-  seoDescription: 'Explore Matt Silliman DJ photos from live sets, behind the booth, promo shoots, press, studio, and lifestyle moments.',
+  seoDescription: 'Explore Matt Silliman DJ photos from live sets, crowd moments, behind-the-booth shots, press images, and visual proof of the room moving.',
   ctaTitle: 'Bring This Energy To Your Event',
-  ctaText: 'Book Matt Silliman for clubs, rooftops, brand activations, private events, and music-forward rooms.',
+  ctaText: 'Book Matt Silliman for clubs, rooftops, private events, venues, brand activations, and music-forward rooms.',
   ctaButtonLabel: 'Book Matt',
   ctaButtonUrl: '/#contact',
   items: [],
@@ -575,7 +575,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                     value={content.contact?.title || ''}
                     onChange={(e) => updateContent('contact', 'title', e.target.value)}
                     className="bg-zinc-800 border-zinc-700 text-white"
-                    placeholder="Get In Touch"
+                    placeholder="Booking & Contact"
                   />
                 </div>
                 <div className="space-y-2">
@@ -768,8 +768,9 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                           onChange={(e) => updateMusicItem(index, 'category', e.target.value as MusicCategory)}
                           className="w-full rounded-md bg-zinc-800 border border-zinc-700 px-3 py-2 text-white"
                         >
-                          <option value="originals">Original Productions</option>
-                          <option value="live">Live Mixes and DJ Sets</option>
+                          <option value="originals">Originals</option>
+                          <option value="live">Live Sets</option>
+                          <option value="deep">Deep / Late-Night Mixes</option>
                         </select>
                       </div>
 

@@ -10,10 +10,13 @@ import { CMS } from './components/CMS';
 const GalleryPage = lazy(() => (
   import('./components/GalleryPage').then((module) => ({ default: module.GalleryPage }))
 ));
+const PressKit = lazy(() => (
+  import('./components/PressKit').then((module) => ({ default: module.PressKit }))
+));
 
 export default function App() {
   const [activeSection, setActiveSection] = useState('hero');
-  const [currentPage, setCurrentPage] = useState<'home' | 'gallery' | 'cms'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'gallery' | 'press' | 'cms'>('home');
 
   useEffect(() => {
     const setPageFromPath = () => {
@@ -23,6 +26,9 @@ export default function App() {
       } else if (path === '/gallery') {
         setCurrentPage('gallery');
         setActiveSection('gallery');
+      } else if (path === '/press') {
+        setCurrentPage('press');
+        setActiveSection('press-kit');
       } else {
         setCurrentPage('home');
       }
@@ -38,7 +44,7 @@ export default function App() {
     if (currentPage !== 'home') return;
 
     const handleScroll = () => {
-      const sections = ['hero', 'about', 'music-production', 'feed', 'contact'];
+      const sections = ['hero', 'about', 'music-production', 'feed', 'press-kit', 'contact'];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
@@ -72,6 +78,17 @@ export default function App() {
     );
   }
 
+  if (currentPage === 'press') {
+    return (
+      <div className="bg-black text-white min-h-screen">
+        <Navigation activeSection="press-kit" />
+        <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center">Loading press kit...</div>}>
+          <PressKit isPage />
+        </Suspense>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-black text-white min-h-screen">
       <Navigation activeSection={activeSection} />
@@ -79,6 +96,9 @@ export default function App() {
       <About />
       <MusicProduction />
       <Feed />
+      <Suspense fallback={null}>
+        <PressKit />
+      </Suspense>
       <Contact />
     </div>
   );
