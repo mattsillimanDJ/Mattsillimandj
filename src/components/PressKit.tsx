@@ -13,18 +13,32 @@ function setMetaTag(selector: string, attribute: 'content' | 'href', value: stri
   }
 }
 
+const homeTitle = 'Matt Silliman | Feelgood House Music DJ & Producer';
+const homeDescription = 'Feelgood house music DJ and producer Matt Silliman brings deep, soulful, high-energy house music to clubs, rooftops, private events, venues, and brand activations.';
+const homeUrl = 'https://www.mattsillimandj.com/';
+const pressTitle = 'Press Kit | Matt Silliman DJ';
+const pressDescription = 'Press kit, artist bio, music, gallery, booking contact, and press links for feelgood house music DJ and producer Matt Silliman.';
+const pressUrl = 'https://www.mattsillimandj.com/press';
+
+function setPageMetadata(title: string, description: string, url: string) {
+  document.title = title;
+  setMetaTag('meta[name="description"]', 'content', description);
+  setMetaTag('link[rel="canonical"]', 'href', url);
+  setMetaTag('meta[property="og:url"]', 'content', url);
+  setMetaTag('meta[property="og:title"]', 'content', title);
+  setMetaTag('meta[property="og:description"]', 'content', description);
+  setMetaTag('meta[name="twitter:title"]', 'content', title);
+  setMetaTag('meta[name="twitter:description"]', 'content', description);
+}
+
 export function PressKit({ isPage = false }: PressKitProps) {
   useEffect(() => {
     if (!isPage) return;
 
-    document.title = 'Press Kit | Matt Silliman DJ';
-    setMetaTag('meta[name="description"]', 'content', 'Press kit, artist bio, music, gallery, booking contact, and press links for feelgood house music DJ and producer Matt Silliman.');
-    setMetaTag('link[rel="canonical"]', 'href', 'https://www.mattsillimandj.com/press');
+    setPageMetadata(pressTitle, pressDescription, pressUrl);
 
     return () => {
-      document.title = 'Matt Silliman | Feelgood House Music DJ & Producer';
-      setMetaTag('meta[name="description"]', 'content', 'Feelgood house music DJ and producer Matt Silliman brings deep, soulful, high-energy house music to clubs, rooftops, private events, venues, and brand activations.');
-      setMetaTag('link[rel="canonical"]', 'href', 'https://www.mattsillimandj.com/');
+      setPageMetadata(homeTitle, homeDescription, homeUrl);
     };
   }, [isPage]);
 
