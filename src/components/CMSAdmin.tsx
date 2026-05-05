@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { normalizeCmsImages } from '../utils/cmsImages';
@@ -127,8 +127,25 @@ const normalizeGalleryCategory = (category?: string): GalleryCategory => (
   galleryCategories.some((item) => item.value === category) ? category as GalleryCategory : 'live-sets'
 );
 
+const inferContentSection = (value: any): keyof ContentData | null => {
+  if (value?.heroImageUrl !== undefined || value?.ctaButtonLabel !== undefined || value?.seoTitle === defaultGalleryContent.seoTitle) {
+    return 'gallery';
+  }
+
+  if (Array.isArray(value?.items) && value.items.some((item: any) => item.soundCloudUrl !== undefined || item.embedCode !== undefined)) {
+    return 'music';
+  }
+
+  if (value?.embedCode !== undefined || (Array.isArray(value?.items) && value.items.some((item: any) => item.permalink !== undefined))) {
+    return 'feed';
+  }
+
+  return null;
+};
+
 export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
   const [content, setContent] = useState<ContentData>({});
+  const contentRef = useRef<ContentData>({});
   const [images, setImages] = useState<ImageData>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -161,14 +178,20 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
     }));
   };
 
-  const getGalleryContent = (): GalleryContent => ({
+  const setContentState = (updater: ContentData | ((prev: ContentData) => ContentData)) => {
+    const next = typeof updater === 'function' ? updater(contentRef.current) : updater;
+    contentRef.current = next;
+    setContent(next);
+  };
+
+  const getGalleryContent = (source: ContentData = content): GalleryContent => ({
     ...defaultGalleryContent,
-    ...content.gallery,
-    items: content.gallery?.items || [],
+    ...source.gallery,
+    items: source.gallery?.items || [],
   });
 
-  const getGalleryItems = () => {
-    const savedItems = getGalleryContent().items;
+  const getGalleryItems = (source: ContentData = content) => {
+    const savedItems = getGalleryContent(source).items;
     return Array.from({ length: Math.max(savedItems.length, 12) }, (_, index) => ({
       id: savedItems[index]?.id || `gallery-${index + 1}`,
       imageUrl: savedItems[index]?.imageUrl || '',
@@ -177,7 +200,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
       category: normalizeGalleryCategory(savedItems[index]?.category),
       sortOrder: Number(savedItems[index]?.sortOrder ?? index + 1),
       featured: Boolean(savedItems[index]?.featured),
-      hidden: Boolean(savedItems[index]?.hidden),
+      hidden: savedItems[index]?.hidden === true,
       date: savedItems[index]?.date || '',
       event: savedItems[index]?.event || '',
       photoCredit: savedItems[index]?.photoCredit || '',
@@ -199,14 +222,20 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
 
       const data = await response.json();
       
-      // Convert array to object
+      // Convert keyed and legacy keyless KV responses to section data.
       const contentObj: ContentData = {};
-      data.content.forEach((item: any) => {
-        const key = item.key.replace('cms_content_', '');
-        contentObj[key as keyof ContentData] = item.value;
+      data.content?.forEach((item: any) => {
+        const value = item?.value || item;
+        const key = typeof item?.key === 'string'
+          ? item.key.replace('cms_content_', '')
+          : inferContentSection(value);
+
+        if (key) {
+          contentObj[key as keyof ContentData] = value;
+        }
       });
 
-      setContent(contentObj);
+      setContentState(contentObj);
     } catch (err) {
       console.error('Failed to load content:', err);
       toast.error('Failed to load content');
@@ -242,7 +271,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
         },
         body: JSON.stringify({
           section,
-          data: content[section as keyof ContentData],
+          data: contentRef.current[section as keyof ContentData],
         }),
       });
 
@@ -313,7 +342,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
   };
 
   const updateContent = (section: keyof ContentData, field: string, value: string) => {
-    setContent(prev => ({
+    setContentState(prev => ({
       ...prev,
       [section]: {
         ...prev[section],
@@ -329,7 +358,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
       [field]: value,
     };
 
-    setContent(prev => ({
+    setContentState(prev => ({
       ...prev,
       feed: {
         ...prev.feed,
@@ -346,7 +375,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
   };
 
   const updateFeedEmbedCode = (value: string) => {
-    setContent(prev => ({
+    setContentState(prev => ({
       ...prev,
       feed: {
         embedCode: value,
@@ -362,14 +391,14 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
       [field]: value,
     };
 
-    setContent(prev => ({
+    setContentState(prev => ({
       ...prev,
       music: { items },
     }));
   };
 
   const updateGalleryPage = (field: keyof Omit<GalleryContent, 'items'>, value: string) => {
-    setContent(prev => ({
+    setContentState(prev => ({
       ...prev,
       gallery: {
         ...defaultGalleryContent,
@@ -385,20 +414,22 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
     field: keyof Omit<GalleryItem, 'id'>,
     value: string | number | boolean,
   ) => {
-    const items = getGalleryItems();
-    items[index] = {
-      ...items[index],
-      [field]: value,
-    };
+    setContentState(prev => {
+      const items = getGalleryItems(prev);
+      items[index] = {
+        ...items[index],
+        [field]: value,
+      };
 
-    setContent(prev => ({
-      ...prev,
-      gallery: {
-        ...defaultGalleryContent,
-        ...prev.gallery,
-        items,
-      },
-    }));
+      return {
+        ...prev,
+        gallery: {
+          ...defaultGalleryContent,
+          ...prev.gallery,
+          items,
+        },
+      };
+    });
   };
 
   const uploadGalleryHeroImage = async (file: File) => {
@@ -1042,9 +1073,13 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                   ))}
                 </div>
 
-                <Button onClick={() => saveContent('gallery')} disabled={saving}>
+                <p className="text-sm text-zinc-400">
+                  Uploads update the preview. Click Save Gallery Page after uploads or edits to publish them.
+                </p>
+
+                <Button onClick={() => saveContent('gallery')} disabled={saving || uploading !== null}>
                   <Save className="mr-2 h-4 w-4" />
-                  {saving ? 'Saving...' : 'Save Gallery Page'}
+                  {saving ? 'Saving...' : uploading ? 'Upload finishing...' : 'Save Gallery Page'}
                 </Button>
               </CardContent>
             </Card>

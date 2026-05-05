@@ -77,6 +77,18 @@ function normalizeGallery(raw: Partial<GalleryContent> | undefined): GalleryCont
   };
 }
 
+function getCmsValue(item: any) {
+  return item?.value || item;
+}
+
+function isGalleryContent(item: any) {
+  const value = getCmsValue(item);
+  return item?.key === 'cms_content_gallery'
+    || value?.heroImageUrl !== undefined
+    || value?.ctaButtonLabel !== undefined
+    || value?.seoTitle === defaultGallery.seoTitle;
+}
+
 export function GalleryPage() {
   const [gallery, setGallery] = useState<GalleryContent>(defaultGallery);
   const [activeFilter, setActiveFilter] = useState<'all' | GalleryCategory>('all');
@@ -91,9 +103,10 @@ export function GalleryPage() {
           },
         });
         const data = await response.json();
-        const galleryContent = data.content?.find((item: any) => item.key === 'cms_content_gallery');
-        if (galleryContent?.value) {
-          setGallery(normalizeGallery(galleryContent.value));
+        const galleryContent = data.content?.find(isGalleryContent);
+        const galleryData = getCmsValue(galleryContent);
+        if (galleryData) {
+          setGallery(normalizeGallery(galleryData));
         }
       } catch (err) {
         console.error('Failed to load gallery content:', err);
@@ -122,7 +135,7 @@ export function GalleryPage() {
 
   const visibleItems = useMemo(() => (
     gallery.items
-      .filter((item) => item.imageUrl && !item.hidden)
+      .filter((item) => item.imageUrl && item.hidden !== true)
       .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0))
   ), [gallery.items]);
 
