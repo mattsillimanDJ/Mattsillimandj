@@ -3,6 +3,7 @@ import { Navigation } from './components/Navigation';
 import { Hero } from './components/Hero';
 import { About } from './components/About';
 import { MusicProduction } from './components/MusicProduction';
+import { Shows } from './components/Shows';
 import { Feed } from './components/Feed';
 import { Contact } from './components/Contact';
 import { CMS } from './components/CMS';
@@ -13,10 +14,13 @@ const GalleryPage = lazy(() => (
 const PressKit = lazy(() => (
   import('./components/PressKit').then((module) => ({ default: module.PressKit }))
 ));
+const ShowsPage = lazy(() => (
+  import('./components/ShowsPage').then((module) => ({ default: module.ShowsPage }))
+));
 
 export default function App() {
   const [activeSection, setActiveSection] = useState('hero');
-  const [currentPage, setCurrentPage] = useState<'home' | 'gallery' | 'press' | 'cms'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'gallery' | 'press' | 'shows' | 'cms'>('home');
 
   useEffect(() => {
     const setPageFromPath = () => {
@@ -29,6 +33,9 @@ export default function App() {
       } else if (path === '/press') {
         setCurrentPage('press');
         setActiveSection('press-kit');
+      } else if (path === '/shows') {
+        setCurrentPage('shows');
+        setActiveSection('shows');
       } else {
         setCurrentPage('home');
       }
@@ -44,7 +51,7 @@ export default function App() {
     if (currentPage !== 'home') return;
 
     const handleScroll = () => {
-      const sections = ['hero', 'about', 'music-production', 'feed', 'contact'];
+      const sections = ['hero', 'about', 'music-production', 'shows', 'feed', 'contact'];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
@@ -89,12 +96,24 @@ export default function App() {
     );
   }
 
+  if (currentPage === 'shows') {
+    return (
+      <div className="bg-black text-white min-h-screen">
+        <Navigation activeSection="shows" />
+        <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center">Loading shows...</div>}>
+          <ShowsPage />
+        </Suspense>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-black text-white min-h-screen">
       <Navigation activeSection={activeSection} />
       <Hero />
       <About />
       <MusicProduction />
+      <Shows />
       <Feed />
       <Contact />
     </div>
