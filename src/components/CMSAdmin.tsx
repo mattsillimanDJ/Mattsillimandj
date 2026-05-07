@@ -75,6 +75,14 @@ interface ShowItem {
   featured: boolean;
 }
 
+interface CaptainsContent {
+  eyebrow: string;
+  heading: string;
+  body: string;
+  ctaLabel: string;
+  ctaUrl: string;
+}
+
 interface ContentData {
   hero?: {
     title: string;
@@ -85,6 +93,7 @@ interface ContentData {
     title: string;
     content: string;
   };
+  captains?: CaptainsContent;
   contact?: {
     title: string;
     email: string;
@@ -108,6 +117,7 @@ interface ImageData {
   portrait?: string;
   aboutBg?: string;
   contactBg?: string;
+  captainsBg?: string;
 }
 
 const normalizeMusicCategory = (category?: string): MusicCategory => (
@@ -135,6 +145,15 @@ const defaultGalleryContent: GalleryContent = {
   items: [],
 };
 
+const defaultCaptainsContent: CaptainsContent = {
+  eyebrow: 'EXPERIENTIAL MUSIC BRAND',
+  heading: 'Captains of Revelry',
+  body: 'Boat parties, warehouse takeovers, destination events. Founded by Matt to bring great people together, play great music, and let the night take care of the rest.',
+  ctaLabel: 'Explore Captains of Revelry',
+  // TODO: Replace with the confirmed Captains of Revelry website URL.
+  ctaUrl: '#',
+};
+
 const normalizeGalleryCategory = (category?: string): GalleryCategory => (
   galleryCategories.some((item) => item.value === category) ? category as GalleryCategory : 'live-sets'
 );
@@ -146,6 +165,10 @@ const inferContentSection = (value: any): keyof ContentData | null => {
 
   if (Array.isArray(value?.items) && value.items.some((item: any) => item.soundCloudUrl !== undefined || item.embedCode !== undefined)) {
     return 'music';
+  }
+
+  if (value?.heading === defaultCaptainsContent.heading || value?.ctaLabel !== undefined) {
+    return 'captains';
   }
 
   if (value?.embedCode !== undefined || (Array.isArray(value?.items) && value.items.some((item: any) => item.permalink !== undefined))) {
@@ -585,6 +608,10 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
   }
 
   const gallery = getGalleryContent();
+  const captains = {
+    ...defaultCaptainsContent,
+    ...content.captains,
+  };
 
   return (
     <div className="min-h-screen bg-black p-4">
@@ -601,6 +628,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
           <TabsList className="bg-zinc-900">
             <TabsTrigger value="hero">Hero</TabsTrigger>
             <TabsTrigger value="about">About</TabsTrigger>
+            <TabsTrigger value="captains">Captains</TabsTrigger>
             <TabsTrigger value="contact">Contact</TabsTrigger>
             <TabsTrigger value="feed">Feed</TabsTrigger>
             <TabsTrigger value="music">Music</TabsTrigger>
@@ -686,6 +714,96 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                 <Button onClick={() => saveContent('about')} disabled={saving}>
                   <Save className="mr-2 h-4 w-4" />
                   {saving ? 'Saving...' : 'Save About Content'}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Captains of Revelry Section */}
+          <TabsContent value="captains">
+            <Card className="bg-zinc-900 border-zinc-800">
+              <CardHeader>
+                <CardTitle className="text-white">Captains of Revelry</CardTitle>
+                <CardDescription>Edit the homepage Captains of Revelry callout block</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="captains-eyebrow" className="text-white">Eyebrow</Label>
+                    <Input
+                      id="captains-eyebrow"
+                      value={captains.eyebrow}
+                      onChange={(e) => updateContent('captains', 'eyebrow', e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="captains-heading" className="text-white">Heading</Label>
+                    <Input
+                      id="captains-heading"
+                      value={captains.heading}
+                      onChange={(e) => updateContent('captains', 'heading', e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="captains-body" className="text-white">Body</Label>
+                  <Textarea
+                    id="captains-body"
+                    value={captains.body}
+                    onChange={(e) => updateContent('captains', 'body', e.target.value)}
+                    className="bg-zinc-800 border-zinc-700 text-white min-h-[120px]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="captains-cta-label" className="text-white">CTA Label</Label>
+                    <Input
+                      id="captains-cta-label"
+                      value={captains.ctaLabel}
+                      onChange={(e) => updateContent('captains', 'ctaLabel', e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="captains-cta-url" className="text-white">CTA URL</Label>
+                    <Input
+                      id="captains-cta-url"
+                      value={captains.ctaUrl}
+                      onChange={(e) => updateContent('captains', 'ctaUrl', e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white"
+                      placeholder="#"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3 border border-zinc-800 rounded-lg p-4">
+                  <Label className="text-white">Background Image</Label>
+                  {images.captainsBg ? (
+                    <img src={images.captainsBg} alt="Captains of Revelry background" className="h-40 w-full rounded object-cover bg-zinc-800" />
+                  ) : (
+                    <div className="h-40 w-full rounded bg-zinc-800 flex items-center justify-center">
+                      <ImageIcon className="h-8 w-8 text-white/40" />
+                    </div>
+                  )}
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) uploadImage('captainsBg', file);
+                    }}
+                    className="bg-zinc-800 border-zinc-700 text-white"
+                    disabled={uploading === 'captainsBg'}
+                  />
+                </div>
+
+                <Button onClick={() => saveContent('captains')} disabled={saving}>
+                  <Save className="mr-2 h-4 w-4" />
+                  {saving ? 'Saving...' : 'Save Captains Content'}
                 </Button>
               </CardContent>
             </Card>

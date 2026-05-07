@@ -2,6 +2,7 @@ import { Suspense, lazy, useState, useEffect } from 'react';
 import { Navigation } from './components/Navigation';
 import { Hero } from './components/Hero';
 import { About } from './components/About';
+import { CaptainsOfRevelry } from './components/CaptainsOfRevelry';
 import { MusicProduction } from './components/MusicProduction';
 import { Shows } from './components/Shows';
 import { Feed } from './components/Feed';
@@ -51,7 +52,7 @@ export default function App() {
     if (currentPage !== 'home') return;
 
     const handleScroll = () => {
-      const sections = ['hero', 'about', 'music-production', 'shows', 'feed', 'contact'];
+      const sections = ['hero', 'about', 'captains-of-revelry', 'music-production', 'shows', 'feed', 'contact'];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
@@ -112,6 +113,7 @@ export default function App() {
       <Navigation activeSection={activeSection} />
       <Hero />
       <About />
+      <CaptainsOfRevelry />
       <MusicProduction />
       <Shows />
       <Feed />
