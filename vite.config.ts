@@ -1,10 +1,25 @@
 
   import { defineConfig } from 'vite';
   import react from '@vitejs/plugin-react-swc';
+  import vitePrerender from 'vite-plugin-prerender';
   import path from 'path';
 
+  const Renderer = vitePrerender.PuppeteerRenderer;
+
   export default defineConfig({
-    plugins: [react()],
+    plugins: [
+      react(),
+      vitePrerender({
+        staticDir: path.join(__dirname, 'build'),
+        routes: ['/', '/gallery', '/press'],
+        renderer: new Renderer({
+          executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+          args: ['--no-sandbox', '--disable-setuid-sandbox'],
+          skipThirdPartyRequests: true,
+          renderAfterTime: 1500,
+        }),
+      }),
+    ],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
