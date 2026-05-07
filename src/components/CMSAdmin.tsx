@@ -8,7 +8,7 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Upload, LogOut, Save, Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
+import { Upload, LogOut, Save, Image as ImageIcon, Plus, Trash2, Download } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
 
 interface CMSAdminProps {
@@ -81,6 +81,13 @@ interface CaptainsContent {
   body: string;
   ctaLabel: string;
   ctaUrl: string;
+}
+
+interface Subscriber {
+  id: string;
+  email: string;
+  source: string;
+  created_at: string;
 }
 
 interface ContentData {
@@ -195,6 +202,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
   const contentRef = useRef<ContentData>({});
   const [images, setImages] = useState<ImageData>({});
   const [shows, setShows] = useState<ShowItem[]>([]);
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState<string | null>(null);
@@ -259,6 +267,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
     loadContent();
     loadImages();
     loadShows();
+    loadSubscribers();
   }, []);
 
   const loadContent = async () => {
@@ -331,6 +340,26 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
       })));
     } catch (err) {
       console.error('Failed to load shows:', err);
+    }
+  };
+
+  const loadSubscribers = async () => {
+    try {
+      const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-80948ead/cms/subscribers`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) return [];
+
+      const data = await response.json();
+      const nextSubscribers = data.subscribers || [];
+      setSubscribers(nextSubscribers);
+      return nextSubscribers;
+    } catch (err) {
+      console.error('Failed to load subscribers:', err);
+      return [];
     }
   };
 
@@ -599,6 +628,30 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
     }
   };
 
+  const exportSubscribers = async () => {
+    const nextSubscribers = await loadSubscribers();
+    const csvRows = [
+      ['email', 'source', 'created_at'],
+      ...nextSubscribers.map((subscriber: Subscriber) => [
+        subscriber.email,
+        subscriber.source,
+        subscriber.created_at,
+      ]),
+    ];
+    const csv = csvRows
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'subscribers.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -634,6 +687,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
             <TabsTrigger value="music">Music</TabsTrigger>
             <TabsTrigger value="shows">Shows</TabsTrigger>
             <TabsTrigger value="gallery">Gallery</TabsTrigger>
+            <TabsTrigger value="subscribers">Subscribers</TabsTrigger>
             <TabsTrigger value="images">Images</TabsTrigger>
           </TabsList>
 
@@ -1463,6 +1517,25 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                 <Button onClick={() => saveContent('gallery')} disabled={saving || uploading !== null}>
                   <Save className="mr-2 h-4 w-4" />
                   {saving ? 'Saving...' : uploading ? 'Upload finishing...' : 'Save Gallery Page'}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Subscribers Section */}
+          <TabsContent value="subscribers">
+            <Card className="bg-zinc-900 border-zinc-800">
+              <CardHeader>
+                <CardTitle className="text-white">Subscribers</CardTitle>
+                <CardDescription>Export newsletter signups as a CSV</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-zinc-400">
+                  {subscribers.length} subscriber{subscribers.length === 1 ? '' : 's'} captured.
+                </p>
+                <Button onClick={exportSubscribers}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Export CSV
                 </Button>
               </CardContent>
             </Card>

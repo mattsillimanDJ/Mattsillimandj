@@ -6,6 +6,7 @@ import { CaptainsOfRevelry } from './components/CaptainsOfRevelry';
 import { MusicProduction } from './components/MusicProduction';
 import { Shows } from './components/Shows';
 import { Feed } from './components/Feed';
+import { Newsletter } from './components/Newsletter';
 import { Contact } from './components/Contact';
 import { CMS } from './components/CMS';
 
@@ -52,7 +53,7 @@ export default function App() {
     if (currentPage !== 'home') return;
 
     const handleScroll = () => {
-      const sections = ['hero', 'about', 'captains-of-revelry', 'music-production', 'shows', 'feed', 'contact'];
+      const sections = ['hero', 'about', 'captains-of-revelry', 'music-production', 'shows', 'feed', 'newsletter', 'contact'];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
@@ -117,6 +118,7 @@ export default function App() {
       <MusicProduction />
       <Shows />
       <Feed />
+      <Newsletter />
       <Contact />
     </div>
   );

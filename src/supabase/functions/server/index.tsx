@@ -211,6 +211,71 @@ app.delete("/make-server-80948ead/cms/shows/:id", async (c) => {
   }
 });
 
+// Public Newsletter Subscribe
+app.post("/make-server-80948ead/subscribers", async (c) => {
+  try {
+    const { email, source } = await c.req.json();
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      return c.json({ error: 'Enter a valid email address.' }, 400);
+    }
+
+    const supabase = getServiceClient();
+    const { error } = await supabase
+      .from('subscribers')
+      .insert({
+        email: normalizedEmail,
+        source: source || 'homepage',
+      });
+
+    if (error) {
+      if (error.code === '23505') {
+        return c.json({ success: true, duplicate: true });
+      }
+
+      console.log(`Subscriber save error: ${error.message}`);
+      return c.json({ error: 'Failed to subscribe', details: error.message }, 500);
+    }
+
+    return c.json({ success: true, duplicate: false });
+  } catch (error) {
+    console.log(`Subscriber save internal error: ${error}`);
+    return c.json({ error: 'Failed to subscribe', details: String(error) }, 500);
+  }
+});
+
+// CMS Subscribers Export
+app.get("/make-server-80948ead/cms/subscribers", async (c) => {
+  try {
+    const user = await getAuthenticatedUser(c);
+
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const supabase = getServiceClient();
+    const { data, error } = await supabase
+      .from('subscribers')
+      .select('id,email,source,created_at')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      if (error.code === '42P01') {
+        return c.json({ subscribers: [] });
+      }
+
+      console.log(`Subscribers fetch error: ${error.message}`);
+      return c.json({ error: 'Failed to fetch subscribers', details: error.message }, 500);
+    }
+
+    return c.json({ subscribers: data || [] });
+  } catch (error) {
+    console.log(`Subscribers fetch internal error: ${error}`);
+    return c.json({ error: 'Failed to fetch subscribers', details: String(error) }, 500);
+  }
+});
+
 // CMS Update Content
 app.post("/make-server-80948ead/cms/content", async (c) => {
   try {
