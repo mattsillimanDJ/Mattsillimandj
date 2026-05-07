@@ -82,7 +82,7 @@ export function CaptainsOfRevelry() {
 
       <div className="relative z-10 max-w-6xl mx-auto">
         <div className="max-w-3xl">
-          <p className="mb-4 text-sm uppercase tracking-widest text-white/40">{content.eyebrow}</p>
+          <p className="mb-4 text-sm uppercase tracking-widest text-white/50">{content.eyebrow}</p>
           <h2 className="text-5xl md:text-6xl mb-6 tracking-tight">{content.heading}</h2>
           <p className="text-lg md:text-xl text-white/65 leading-relaxed">{content.body}</p>
           <a

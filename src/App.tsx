@@ -8,7 +8,6 @@ import { Shows } from './components/Shows';
 import { Feed } from './components/Feed';
 import { Newsletter } from './components/Newsletter';
 import { Contact } from './components/Contact';
-import { CMS } from './components/CMS';
 
 const GalleryPage = lazy(() => (
   import('./components/GalleryPage').then((module) => ({ default: module.GalleryPage }))
@@ -18,6 +17,9 @@ const PressKit = lazy(() => (
 ));
 const ShowsPage = lazy(() => (
   import('./components/ShowsPage').then((module) => ({ default: module.ShowsPage }))
+));
+const CMS = lazy(() => (
+  import('./components/CMS').then((module) => ({ default: module.CMS }))
 ));
 
 export default function App() {
@@ -73,7 +75,11 @@ export default function App() {
   }, [currentPage]);
 
   if (currentPage === 'cms') {
-    return <CMS />;
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center">Loading CMS...</div>}>
+        <CMS />
+      </Suspense>
+    );
   }
 
   if (currentPage === 'gallery') {

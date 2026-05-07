@@ -3,8 +3,12 @@
   import react from '@vitejs/plugin-react-swc';
   import vitePrerender from 'vite-plugin-prerender';
   import path from 'path';
+  import { existsSync } from 'fs';
 
   const Renderer = vitePrerender.PuppeteerRenderer;
+  const localChromePath = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+  const prerenderChromePath = process.env.PRERENDER_CHROME_PATH
+    || (existsSync(localChromePath) ? localChromePath : undefined);
 
   export default defineConfig({
     plugins: [
@@ -13,7 +17,7 @@
         staticDir: path.join(__dirname, 'build'),
         routes: ['/', '/gallery', '/press'],
         renderer: new Renderer({
-          executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+          ...(prerenderChromePath ? { executablePath: prerenderChromePath } : {}),
           args: ['--no-sandbox', '--disable-setuid-sandbox'],
           skipThirdPartyRequests: true,
           renderAfterTime: 1500,
@@ -70,6 +74,15 @@
     build: {
       target: 'esnext',
       outDir: 'build',
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('@supabase/supabase-js') || id.includes('@jsr/supabase__supabase-js')) {
+              return 'supabase';
+            }
+          },
+        },
+      },
     },
     server: {
       port: 3000,

@@ -140,7 +140,7 @@ export function Shows() {
       <div className="max-w-6xl mx-auto">
         <div className="mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="mb-4 text-sm uppercase tracking-widest text-white/40">Live Dates</p>
+            <p className="mb-4 text-sm uppercase tracking-widest text-white/50">Live Dates</p>
             <h2 className="text-5xl md:text-6xl tracking-tight">{heading}</h2>
           </div>
           {shows.length > 6 && (
