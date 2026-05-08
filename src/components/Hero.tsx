@@ -16,9 +16,9 @@ const emptyHeroContent: HeroContent = {
 
 function normalizeHeroContent(raw: Partial<HeroContent> | undefined): HeroContent {
   return {
-    title: raw?.title || '',
-    subtitle: raw?.subtitle || '',
-    description: raw?.description || '',
+    title: raw?.title?.trim() ? raw.title : '',
+    subtitle: raw?.subtitle?.trim() ? raw.subtitle : '',
+    description: raw?.description?.trim() ? raw.description : '',
   };
 }
 
