@@ -28,7 +28,7 @@ export default function App() {
 
   useEffect(() => {
     const setPageFromPath = () => {
-      const path = window.location.pathname;
+      const path = window.location.pathname.replace(/\/$/, '') || '/';
       if (path === '/cms') {
         setCurrentPage('cms');
       } else if (path === '/gallery') {
