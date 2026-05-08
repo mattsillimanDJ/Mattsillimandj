@@ -7,6 +7,19 @@ interface AboutContent {
   content: string;
 }
 
+function getCmsValue(item: any) {
+  return item?.value || item;
+}
+
+function isAboutContent(item: any) {
+  const value = getCmsValue(item);
+  return item?.key === 'cms_content_about'
+    || (
+      typeof value?.title === 'string'
+      && typeof value?.content === 'string'
+    );
+}
+
 export function About() {
   const [content, setContent] = useState<AboutContent>({
     title: '',
@@ -24,10 +37,11 @@ export function About() {
           },
         });
         const data = await response.json();
-        const aboutContent = data.content.find((item: any) => item.key === 'cms_content_about');
+        const aboutContent = data.content?.find(isAboutContent);
+        const aboutValue = getCmsValue(aboutContent);
         setContent({
-          title: aboutContent?.value?.title || '',
-          content: aboutContent?.value?.content || '',
+          title: aboutValue?.title || '',
+          content: aboutValue?.content || '',
         });
       } catch (err) {
         console.error('Failed to load about content:', err);

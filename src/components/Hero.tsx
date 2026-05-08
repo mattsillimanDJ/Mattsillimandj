@@ -22,6 +22,19 @@ function normalizeHeroContent(raw: Partial<HeroContent> | undefined): HeroConten
   };
 }
 
+function getCmsValue(item: any) {
+  return item?.value || item;
+}
+
+function isHeroContent(item: any) {
+  const value = getCmsValue(item);
+  return item?.key === 'cms_content_hero'
+    || (
+      typeof value?.title === 'string'
+      && (value?.subtitle !== undefined || value?.description !== undefined)
+    );
+}
+
 export function Hero() {
   const [content, setContent] = useState<HeroContent>(emptyHeroContent);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -36,8 +49,8 @@ export function Hero() {
           },
         });
         const data = await response.json();
-        const heroContent = data.content.find((item: any) => item.key === 'cms_content_hero');
-        setContent(normalizeHeroContent(heroContent?.value));
+        const heroContent = data.content?.find(isHeroContent);
+        setContent(normalizeHeroContent(getCmsValue(heroContent)));
       } catch (err) {
         console.error('Failed to load hero content:', err);
       }
