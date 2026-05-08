@@ -1,28 +1,106 @@
 
   import { defineConfig } from 'vite';
   import react from '@vitejs/plugin-react-swc';
-  import vitePrerender from 'vite-plugin-prerender';
   import path from 'path';
-  import { existsSync } from 'fs';
+  import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 
-  const Renderer = vitePrerender.PuppeteerRenderer;
-  const localChromePath = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-  const prerenderChromePath = process.env.PRERENDER_CHROME_PATH
-    || (existsSync(localChromePath) ? localChromePath : undefined);
+  const homeTitle = 'Matt Silliman | Feelgood House Music DJ & Producer';
+  const homeDescription = 'Feelgood house music DJ and producer Matt Silliman brings deep, soulful, high-energy house music to clubs, rooftops, private events, venues, and brand activations.';
+  const defaultShareImage = 'https://www.mattsillimandj.com/og-default.jpg';
+  const homeStaticHtml = `
+        <div class="bg-black text-white min-h-screen">
+          <section id="hero" class="min-h-screen flex items-center justify-center relative overflow-hidden">
+            <div class="relative z-10 text-center px-6">
+              <h1 class="text-7xl md:text-7xl lg:text-8xl mb-6 tracking-tight">MATT SILLIMAN</h1>
+              <p class="text-xl md:text-2xl text-white/60 tracking-widest uppercase">Feelgood house for rooms that want to move.</p>
+              <p class="max-w-2xl mx-auto mt-6 text-lg md:text-xl text-white/70 leading-relaxed">Deep, soulful, high-energy house music for clubs, rooftops, private events, venues, and brand activations.</p>
+            </div>
+          </section>
+          <section id="about" class="min-h-screen flex items-center py-24 px-6 relative">
+            <div class="max-w-4xl mx-auto relative z-10">
+              <h2 class="text-5xl md:text-6xl mb-12 tracking-tight">About Matt Silliman</h2>
+              <p>Matt Silliman is a feelgood house music DJ and producer creating deep, soulful, high-energy house for clubs, rooftops, private events, venues, brand activations, and music-forward rooms. Atlanta-born and built for rooms that want to move, his sets are warm, polished, and rooted in connection.</p>
+            </div>
+          </section>
+          <section id="captains-of-revelry" class="relative overflow-hidden bg-neutral-950 px-6 py-24">
+            <div class="relative z-10 max-w-6xl mx-auto">
+              <p class="mb-4 text-sm uppercase tracking-widest text-white/50">EXPERIENTIAL MUSIC BRAND</p>
+              <h2 class="text-5xl md:text-6xl mb-6 tracking-tight">Captains of Revelry</h2>
+              <p>Boat parties, warehouse takeovers, destination events. Founded by Matt to bring great people together, play great music, and let the night take care of the rest.</p>
+            </div>
+          </section>
+          <section id="shows" class="py-24 px-6 bg-black">
+            <div class="max-w-6xl mx-auto">
+              <p class="mb-4 text-sm uppercase tracking-widest text-white/50">Live Dates</p>
+              <h2 class="text-5xl md:text-6xl tracking-tight">Recent Shows</h2>
+              <p>Shows will appear here once published in the CMS.</p>
+            </div>
+          </section>
+          <section id="newsletter" class="px-6 py-24 bg-neutral-950">
+            <div class="max-w-6xl mx-auto">
+              <h2 class="text-5xl md:text-6xl mb-4 tracking-tight">Stay close.</h2>
+              <p>New mixes, releases, and shows. No spam.</p>
+            </div>
+          </section>
+        </div>`;
+
+  function setTag(html: string, selector: string, value: string) {
+    return html.replace(selector, value);
+  }
+
+  function writePrerenderedRoutes() {
+    const buildDir = path.resolve(__dirname, 'build');
+    const indexPath = path.join(buildDir, 'index.html');
+    const baseHtml = readFileSync(indexPath, 'utf8');
+    const homeHtml = baseHtml.replace('<div id="root"></div>', `<div id="root">${homeStaticHtml}</div>`);
+
+    writeFileSync(indexPath, homeHtml);
+
+    const galleryHtml = setTag(
+      setTag(
+        baseHtml,
+        /<title>.*?<\/title>/,
+        '<title>Gallery | Matt Silliman DJ</title>',
+      ),
+      /<link rel="canonical" href="[^"]*" \/>/,
+      '<link rel="canonical" href="https://www.mattsillimandj.com/gallery" />',
+    )
+      .replace(/<meta property="og:url" content="[^"]*" \/>/, '<meta property="og:url" content="https://www.mattsillimandj.com/gallery" />')
+      .replace(/<meta property="og:title" content="[^"]*" \/>/, '<meta property="og:title" content="Gallery | Matt Silliman DJ" />')
+      .replace('<div id="root"></div>', '<div id="root"><main class="bg-black text-white min-h-screen"><h1>Gallery</h1><p>Live sets, crowd moments, behind-the-booth shots, and visual proof of the room moving.</p></main></div>');
+
+    const pressHtml = setTag(
+      setTag(
+        baseHtml,
+        /<title>.*?<\/title>/,
+        '<title>Press Kit | Matt Silliman DJ</title>',
+      ),
+      /<link rel="canonical" href="[^"]*" \/>/,
+      '<link rel="canonical" href="https://www.mattsillimandj.com/press" />',
+    )
+      .replace(/<meta property="og:url" content="[^"]*" \/>/, '<meta property="og:url" content="https://www.mattsillimandj.com/press" />')
+      .replace(/<meta property="og:title" content="[^"]*" \/>/, '<meta property="og:title" content="Press Kit | Matt Silliman DJ" />')
+      .replace('<div id="root"></div>', '<div id="root"><main class="bg-black text-white min-h-screen"><h1>Press / EPK</h1><p>A quick resource for promoters, venues, brands, and media.</p></main></div>');
+
+    mkdirSync(path.join(buildDir, 'gallery'), { recursive: true });
+    mkdirSync(path.join(buildDir, 'press'), { recursive: true });
+    writeFileSync(path.join(buildDir, 'gallery', 'index.html'), galleryHtml);
+    writeFileSync(path.join(buildDir, 'press', 'index.html'), pressHtml);
+  }
+
+  function staticShellPrerender() {
+    return {
+      name: 'static-shell-prerender',
+      closeBundle() {
+        writePrerenderedRoutes();
+      },
+    };
+  }
 
   export default defineConfig({
     plugins: [
       react(),
-      vitePrerender({
-        staticDir: path.join(__dirname, 'build'),
-        routes: ['/', '/gallery', '/press'],
-        renderer: new Renderer({
-          ...(prerenderChromePath ? { executablePath: prerenderChromePath } : {}),
-          args: ['--no-sandbox', '--disable-setuid-sandbox'],
-          skipThirdPartyRequests: true,
-          renderAfterTime: 1500,
-        }),
-      }),
+      staticShellPrerender(),
     ],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
