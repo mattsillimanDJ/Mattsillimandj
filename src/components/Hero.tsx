@@ -79,7 +79,7 @@ export function Hero() {
   }, []);
 
   return (
-    <section id="hero" className="min-h-screen flex items-start justify-center relative overflow-hidden pt-[25vh]">
+    <section id="hero" style={{ paddingTop: "45vh" }} className="min-h-screen flex items-start justify-center relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-black via-black/95 to-black"></div>
       
       {/* Portrait Image - positioned right of center */}

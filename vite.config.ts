@@ -82,7 +82,7 @@
 
     return `
         <div class="bg-black text-white min-h-screen">
-          <section id="hero" class="min-h-screen flex items-start justify-center relative overflow-hidden pt-[25vh]">
+          <section id="hero" style="padding-top: 45vh" class="min-h-screen flex items-start justify-center relative overflow-hidden">
             <div class="relative z-10 text-center px-6">
               ${heroTitle ? `<h1 class="text-7xl md:text-7xl lg:text-8xl tracking-tight">${escapeHtml(heroTitle)}</h1>` : ''}
               ${heroSubtitle ? `<p class="mt-6 text-xl md:text-2xl text-white/60 tracking-widest uppercase">${escapeHtml(heroSubtitle)}</p>` : ''}
