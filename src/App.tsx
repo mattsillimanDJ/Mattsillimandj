@@ -6,7 +6,6 @@ import { CaptainsOfRevelry } from './components/CaptainsOfRevelry';
 import { MusicProduction } from './components/MusicProduction';
 import { Shows } from './components/Shows';
 import { Feed } from './components/Feed';
-import { Newsletter } from './components/Newsletter';
 import { Contact } from './components/Contact';
 
 const GalleryPage = lazy(() => (
@@ -55,7 +54,7 @@ export default function App() {
     if (currentPage !== 'home') return;
 
     const handleScroll = () => {
-      const sections = ['hero', 'about', 'music-production', 'feed', 'shows', 'captains-of-revelry', 'newsletter', 'contact'];
+      const sections = ['hero', 'about', 'music-production', 'feed', 'shows', 'captains-of-revelry', 'contact'];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
@@ -124,7 +123,6 @@ export default function App() {
       <Feed />
       <Shows />
       <CaptainsOfRevelry />
-      <Newsletter />
       <Contact />
     </div>
   );
