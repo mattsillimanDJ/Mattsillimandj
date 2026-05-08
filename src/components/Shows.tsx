@@ -31,8 +31,21 @@ export function Shows() {
   }, []);
 
   return (
-    <section id="shows" className="py-24 px-6 bg-black">
-      <div className="max-w-6xl mx-auto">
+    <section
+      id="shows"
+      className="relative overflow-hidden bg-black px-6"
+      style={{
+        paddingTop: '2.5rem',
+        paddingBottom: '6rem',
+        backgroundImage: "url('/shows-background.png')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        scrollMarginTop: '5rem',
+      }}
+    >
+      <div className="absolute inset-0 bg-black/60" />
+
+      <div className="relative z-10 max-w-6xl mx-auto">
         <div className="mb-12">
           <div>
             <p className="mb-4 text-sm uppercase tracking-widest text-white/50">Live Dates</p>

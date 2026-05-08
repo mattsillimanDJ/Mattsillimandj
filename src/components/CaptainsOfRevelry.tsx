@@ -70,14 +70,18 @@ export function CaptainsOfRevelry() {
   const ctaIsPlaceholder = content.ctaUrl === '#';
 
   return (
-    <section id="captains-of-revelry" className="relative overflow-hidden bg-neutral-950 px-6 py-24">
+    <section
+      id="captains-of-revelry"
+      className="relative overflow-hidden bg-neutral-950 px-6"
+      style={{ minHeight: '80vh', paddingTop: '10rem', paddingBottom: '10rem', scrollMarginTop: '5rem' }}
+    >
       {bgImageUrl && (
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-35"
-          style={{ backgroundImage: `url(${bgImageUrl})` }}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${bgImageUrl})`, opacity: 0.5 }}
         />
       )}
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-black/50" />
 
       <div className="relative z-10 max-w-6xl mx-auto">
         <div className="max-w-3xl">
