@@ -66,7 +66,7 @@ export function Hero() {
   }, []);
 
   return (
-    <section id="hero" className="min-h-screen flex items-center justify-center relative overflow-hidden">
+    <section id="hero" className="min-h-screen flex items-start justify-center relative overflow-hidden pt-[25vh]">
       <div className="absolute inset-0 bg-gradient-to-b from-black via-black/95 to-black"></div>
       
       {/* Portrait Image - positioned right of center */}
@@ -82,12 +82,12 @@ export function Hero() {
       
       <div className="relative z-10 text-center px-6">
         {content.title && (
-          <h1 className="text-7xl md:text-7xl lg:text-8xl mb-6 tracking-tight">
+          <h1 className="text-7xl md:text-7xl lg:text-8xl tracking-tight">
             {content.title}
           </h1>
         )}
         {content.subtitle && (
-          <p className="text-xl md:text-2xl text-white/60 tracking-widest uppercase">
+          <p className="mt-6 text-xl md:text-2xl text-white/60 tracking-widest uppercase">
             {content.subtitle}
           </p>
         )}
