@@ -55,7 +55,7 @@ export default function App() {
     if (currentPage !== 'home') return;
 
     const handleScroll = () => {
-      const sections = ['hero', 'about', 'captains-of-revelry', 'music-production', 'shows', 'feed', 'newsletter', 'contact'];
+      const sections = ['hero', 'about', 'music-production', 'feed', 'shows', 'captains-of-revelry', 'newsletter', 'contact'];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
@@ -120,10 +120,10 @@ export default function App() {
       <Navigation activeSection={activeSection} />
       <Hero />
       <About />
-      <CaptainsOfRevelry />
       <MusicProduction />
-      <Shows />
       <Feed />
+      <Shows />
+      <CaptainsOfRevelry />
       <Newsletter />
       <Contact />
     </div>
