@@ -2,29 +2,28 @@ import { useState, useEffect } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { normalizeCmsImages } from '../utils/cmsImages';
 
-const defaultHeroContent = {
-  title: 'MATT SILLIMAN',
-  subtitle: 'Feelgood house for rooms that want to move.',
-  description: 'Deep, soulful, high-energy house music for clubs, rooftops, private events, venues, and brand activations.',
+interface HeroContent {
+  title: string;
+  subtitle: string;
+  description: string;
+}
+
+const emptyHeroContent: HeroContent = {
+  title: '',
+  subtitle: '',
+  description: '',
 };
 
-function normalizeHeroContent(raw: Partial<typeof defaultHeroContent> | undefined) {
-  const next = { ...defaultHeroContent, ...raw };
-  const localOnlyPositioning = /atlanta\s+house\s+music\s+dj|atlanta\s+dj/i;
-
-  if (localOnlyPositioning.test(next.subtitle || '')) {
-    next.subtitle = defaultHeroContent.subtitle;
-  }
-
-  if (localOnlyPositioning.test(next.description || '')) {
-    next.description = defaultHeroContent.description;
-  }
-
-  return next;
+function normalizeHeroContent(raw: Partial<HeroContent> | undefined): HeroContent {
+  return {
+    title: raw?.title || '',
+    subtitle: raw?.subtitle || '',
+    description: raw?.description || '',
+  };
 }
 
 export function Hero() {
-  const [content, setContent] = useState(defaultHeroContent);
+  const [content, setContent] = useState<HeroContent>(emptyHeroContent);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -38,9 +37,7 @@ export function Hero() {
         });
         const data = await response.json();
         const heroContent = data.content.find((item: any) => item.key === 'cms_content_hero');
-        if (heroContent) {
-          setContent(normalizeHeroContent(heroContent.value));
-        }
+        setContent(normalizeHeroContent(heroContent?.value));
       } catch (err) {
         console.error('Failed to load hero content:', err);
       }
@@ -84,15 +81,21 @@ export function Hero() {
       )}
       
       <div className="relative z-10 text-center px-6">
-        <h1 className="text-7xl md:text-7xl lg:text-8xl mb-6 tracking-tight">
-          {content.title}
-        </h1>
-        <p className="text-xl md:text-2xl text-white/60 tracking-widest uppercase">
-          {content.subtitle}
-        </p>
-        <p className="max-w-2xl mx-auto mt-6 text-lg md:text-xl text-white/70 leading-relaxed">
-          {content.description}
-        </p>
+        {content.title && (
+          <h1 className="text-7xl md:text-7xl lg:text-8xl mb-6 tracking-tight">
+            {content.title}
+          </h1>
+        )}
+        {content.subtitle && (
+          <p className="text-xl md:text-2xl text-white/60 tracking-widest uppercase">
+            {content.subtitle}
+          </p>
+        )}
+        {content.description && (
+          <p className="max-w-2xl mx-auto mt-6 text-lg md:text-xl text-white/70 leading-relaxed">
+            {content.description}
+          </p>
+        )}
       </div>
       
       <div className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce">
