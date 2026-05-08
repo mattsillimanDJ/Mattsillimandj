@@ -157,8 +157,7 @@ const defaultCaptainsContent: CaptainsContent = {
   heading: 'Captains of Revelry',
   body: 'Boat parties, warehouse takeovers, destination events. Founded by Matt to bring great people together, play great music, and let the night take care of the rest.',
   ctaLabel: 'Explore Captains of Revelry',
-  // TODO: Replace with the confirmed Captains of Revelry website URL.
-  ctaUrl: '#',
+  ctaUrl: 'https://www.captainsofrevelry.com',
 };
 
 const normalizeGalleryCategory = (category?: string): GalleryCategory => (
