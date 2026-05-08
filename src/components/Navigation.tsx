@@ -45,7 +45,6 @@ export function Navigation({ activeSection }: NavigationProps) {
   };
 
   const goToGallery = () => {
-    window.history.pushState({}, '', '/gallery');
     window.location.href = '/gallery';
   };
 
