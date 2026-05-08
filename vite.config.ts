@@ -95,6 +95,29 @@
               ${aboutContent ? `<div class="space-y-6 text-lg text-white/70 leading-relaxed">${aboutContent}</div>` : ''}
             </div>
           </section>
+          <section id="music-production" class="min-h-screen py-24 px-6 bg-gradient-to-b from-black to-neutral-950">
+            <div class="max-w-6xl mx-auto">
+              <h2 class="text-5xl md:text-6xl mb-6 tracking-tight">Music</h2>
+              <p class="max-w-3xl mb-16 text-lg text-white/60 leading-relaxed">Curated originals and sets that move between deep, soulful warmth and high-energy house.</p>
+              <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="border border-white/10 bg-white/5 p-8"><h3 class="text-xl mb-4">Originals</h3><p class="text-white/60">Feelgood house originals shaped around deep grooves, vocal moments, warmth, and dance floor momentum.</p></div>
+                <div class="border border-white/10 bg-white/5 p-8"><h3 class="text-xl mb-4">Live Mixes</h3><p class="text-white/60">High-energy sets built for clubs, rooftops, private events, venues, and brand activations.</p></div>
+              </div>
+            </div>
+          </section>
+          <section id="feed" class="min-h-screen bg-black py-20 px-6">
+            <div class="max-w-7xl mx-auto text-center">
+              <h2 class="text-5xl tracking-tight mb-5">FEED</h2>
+              <p class="text-white/60">@mattsilliman_dj</p>
+            </div>
+          </section>
+          <section id="shows" class="py-24 px-6 bg-black">
+            <div class="max-w-6xl mx-auto">
+              <p class="mb-4 text-sm uppercase tracking-widest text-white/50">Live Dates</p>
+              <h2 class="text-5xl md:text-6xl tracking-tight">Shows</h2>
+              <p class="border-t border-white/10 py-6 mt-12 text-white/50">Shows image will appear here once uploaded in the CMS.</p>
+            </div>
+          </section>
           <section id="captains-of-revelry" class="relative overflow-hidden bg-neutral-950 px-6 py-24">
             <div class="relative z-10 max-w-6xl mx-auto">
               <p class="mb-4 text-sm uppercase tracking-widest text-white/50">EXPERIENTIAL MUSIC BRAND</p>
@@ -102,17 +125,9 @@
               <p>Boat parties, warehouse takeovers, destination events. Founded by Matt to bring great people together, play great music, and let the night take care of the rest.</p>
             </div>
           </section>
-          <section id="shows" class="py-24 px-6 bg-black">
+          <section id="contact" class="min-h-screen flex items-center py-24 px-6 bg-black">
             <div class="max-w-6xl mx-auto">
-              <p class="mb-4 text-sm uppercase tracking-widest text-white/50">Live Dates</p>
-              <h2 class="text-5xl md:text-6xl tracking-tight">Recent Shows</h2>
-              <p>Shows will appear here once published in the CMS.</p>
-            </div>
-          </section>
-          <section id="newsletter" class="px-6 py-24 bg-neutral-950">
-            <div class="max-w-6xl mx-auto">
-              <h2 class="text-5xl md:text-6xl mb-4 tracking-tight">Stay close.</h2>
-              <p>New mixes, releases, and shows. No spam.</p>
+              <h2 class="text-5xl md:text-6xl mb-6 tracking-tight">Contact</h2>
             </div>
           </section>
         </div>`;

@@ -76,12 +76,12 @@ export function Feed() {
   return (
     <section id="feed" className="min-h-screen bg-black py-20 px-6">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-center gap-4 mb-12">
+        <div className="flex items-center justify-center gap-4 mb-5">
           <Instagram className="w-8 h-8 text-white/60" />
           <h2 className="text-5xl tracking-tight">FEED</h2>
         </div>
 
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <a
             href={instagramUrl}
             target="_blank"

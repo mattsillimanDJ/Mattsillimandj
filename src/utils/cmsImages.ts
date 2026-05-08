@@ -4,6 +4,7 @@ export interface CmsImages {
   aboutBg?: string;
   contactBg?: string;
   captainsBg?: string;
+  showsImage?: string;
 }
 
 const fileNameToKey: Record<string, keyof CmsImages> = {
@@ -12,6 +13,10 @@ const fileNameToKey: Record<string, keyof CmsImages> = {
   'aboutbg.png': 'aboutBg',
   'contactbg.png': 'contactBg',
   'captainsbg.png': 'captainsBg',
+  'showsimage.png': 'showsImage',
+  'showsimage.jpg': 'showsImage',
+  'showsimage.jpeg': 'showsImage',
+  'showsimage.webp': 'showsImage',
 };
 
 function keyFromUrl(url: string): keyof CmsImages | undefined {

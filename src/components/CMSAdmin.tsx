@@ -125,6 +125,7 @@ interface ImageData {
   aboutBg?: string;
   contactBg?: string;
   captainsBg?: string;
+  showsImage?: string;
 }
 
 const normalizeMusicCategory = (category?: string): MusicCategory => (
@@ -595,6 +596,25 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
         gallery: nextGallery,
       }));
       await saveContentData('gallery', nextGallery, `Gallery image ${index + 1} uploaded and saved!`);
+    }
+  };
+
+  const uploadShowsImage = async (file: File) => {
+    const imageUrl = await uploadImage('showsImage', file);
+    if (imageUrl) {
+      const versionedUrl = addImageVersion(imageUrl);
+      await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-80948ead/cms/images`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          imageName: 'showsImage',
+          url: versionedUrl,
+        }),
+      });
+      setImages(prev => ({ ...prev, showsImage: versionedUrl }));
     }
   };
 
@@ -1121,7 +1141,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                           className="w-full rounded-md bg-zinc-800 border border-zinc-700 px-3 py-2 text-white"
                         >
                           <option value="originals">Originals</option>
-                          <option value="live">Live Sets</option>
+                          <option value="live">Live Mixes</option>
                           <option value="deep">Deep / Late-Night Mixes</option>
                         </select>
                       </div>
@@ -1166,7 +1186,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <div>
                     <CardTitle className="text-white">Shows</CardTitle>
-                    <CardDescription>Manage upcoming and past live dates</CardDescription>
+                    <CardDescription>Upload the public Shows flyer. Manual date fields are kept here for legacy records.</CardDescription>
                   </div>
                   <Button onClick={addShow}>
                     <Plus className="mr-2 h-4 w-4" />
@@ -1175,6 +1195,38 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
+                <div className="space-y-3 rounded-lg border border-zinc-800 p-4">
+                  <Label className="text-white">Public Shows Image</Label>
+                  {images.showsImage ? (
+                    <img
+                      src={images.showsImage}
+                      alt="Shows flyer preview"
+                      className="aspect-[4/5] w-full max-w-xs rounded object-cover bg-zinc-800"
+                    />
+                  ) : (
+                    <div className="aspect-[4/5] w-full max-w-xs rounded bg-zinc-800 flex items-center justify-center">
+                      <ImageIcon className="h-8 w-8 text-white/40" />
+                    </div>
+                  )}
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) uploadShowsImage(file);
+                    }}
+                    className="bg-zinc-800 border-zinc-700 text-white"
+                    disabled={uploading === 'showsImage'}
+                  />
+                  <p className="text-sm text-zinc-400">
+                    This 4x5 image is what visitors see in the homepage Shows section.
+                  </p>
+                </div>
+
+                <div className="border-t border-zinc-800 pt-6">
+                  <p className="mb-4 text-sm uppercase tracking-widest text-zinc-500">Legacy manual show dates</p>
+                </div>
+
                 {shows.length === 0 ? (
                   <p className="rounded-lg border border-zinc-800 p-4 text-zinc-400">
                     No shows yet. Add a show when Matt is ready to publish dates.

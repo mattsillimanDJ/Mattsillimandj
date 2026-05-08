@@ -48,21 +48,6 @@ const defaultGallery: GalleryContent = {
 };
 const defaultShareImage = 'https://www.mattsillimandj.com/og-default.jpg';
 
-const filters: Array<{ value: 'all' | GalleryCategory; label: string }> = [
-  { value: 'all', label: 'All' },
-  { value: 'live-sets', label: 'Live Sets' },
-  { value: 'behind-the-booth', label: 'Behind the Booth' },
-  { value: 'promo-press', label: 'Promo / Press' },
-  { value: 'studio-lifestyle', label: 'Studio / Lifestyle' },
-];
-
-const categoryLabels: Record<GalleryCategory, string> = {
-  'live-sets': 'Live Sets',
-  'behind-the-booth': 'Behind the Booth',
-  'promo-press': 'Promo / Press',
-  'studio-lifestyle': 'Studio / Lifestyle',
-};
-
 function setMetaTag(selector: string, attribute: 'content' | 'href', value: string) {
   const tag = document.head.querySelector(selector);
   if (tag) {
@@ -117,7 +102,6 @@ function isGalleryContent(item: any) {
 
 export function GalleryPage() {
   const [gallery, setGallery] = useState<GalleryContent>(defaultGallery);
-  const [activeFilter, setActiveFilter] = useState<'all' | GalleryCategory>('all');
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -171,13 +155,7 @@ export function GalleryPage() {
       .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0))
   ), [gallery.items]);
 
-  const filteredItems = useMemo(() => (
-    activeFilter === 'all'
-      ? visibleItems
-      : visibleItems.filter((item) => item.category === activeFilter)
-  ), [activeFilter, visibleItems]);
-
-  const activeItem = activeIndex === null ? null : filteredItems[activeIndex];
+  const activeItem = activeIndex === null ? null : visibleItems[activeIndex];
 
   useEffect(() => {
     if (!activeItem) return;
@@ -187,10 +165,10 @@ export function GalleryPage() {
         setActiveIndex(null);
       }
       if (event.key === 'ArrowRight') {
-        setActiveIndex((index) => index === null ? null : (index + 1) % filteredItems.length);
+        setActiveIndex((index) => index === null ? null : (index + 1) % visibleItems.length);
       }
       if (event.key === 'ArrowLeft') {
-        setActiveIndex((index) => index === null ? null : (index - 1 + filteredItems.length) % filteredItems.length);
+        setActiveIndex((index) => index === null ? null : (index - 1 + visibleItems.length) % visibleItems.length);
       }
     };
 
@@ -200,7 +178,7 @@ export function GalleryPage() {
       document.body.style.overflow = '';
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [activeItem, filteredItems.length]);
+  }, [activeItem, visibleItems.length]);
 
   const navigateToContact = () => {
     if (gallery.ctaButtonUrl.startsWith('/#')) {
@@ -231,31 +209,11 @@ export function GalleryPage() {
       </section>
 
       <section className="gallery-shell gallery-section" aria-labelledby="gallery-grid-title">
-        <div className="gallery-toolbar">
-          <div>
-            <p className="gallery-kicker">Visual Portfolio</p>
-            <h2 id="gallery-grid-title">DJ Photos</h2>
-          </div>
-          <div className="gallery-filters" aria-label="Gallery categories">
-            {filters.map((filter) => (
-              <button
-                key={filter.value}
-                type="button"
-                onClick={() => {
-                  setActiveFilter(filter.value);
-                  setActiveIndex(null);
-                }}
-                className={activeFilter === filter.value ? 'is-active' : ''}
-              >
-                {filter.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <h2 id="gallery-grid-title" className="sr-only">Gallery photos</h2>
 
-        {filteredItems.length > 0 ? (
+        {visibleItems.length > 0 ? (
           <div className="gallery-grid">
-            {filteredItems.map((item, index) => (
+            {visibleItems.map((item, index) => (
               <button
                 key={item.id}
                 type="button"
@@ -269,10 +227,11 @@ export function GalleryPage() {
                   loading="lazy"
                   decoding="async"
                 />
-                <span className="gallery-card__meta">
-                  <span>{categoryLabels[item.category]}</span>
-                  {item.caption && <strong>{item.caption}</strong>}
-                </span>
+                {item.caption && (
+                  <span className="gallery-card__meta">
+                    <strong>{item.caption}</strong>
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -323,11 +282,11 @@ export function GalleryPage() {
           >
             <X className="w-5 h-5" aria-hidden="true" />
           </button>
-          {filteredItems.length > 1 && (
+          {visibleItems.length > 1 && (
             <button
               type="button"
               className="gallery-lightbox__prev"
-              onClick={() => setActiveIndex((activeIndex - 1 + filteredItems.length) % filteredItems.length)}
+              onClick={() => setActiveIndex((activeIndex - 1 + visibleItems.length) % visibleItems.length)}
               aria-label="Previous gallery image"
             >
               <ArrowLeft className="w-5 h-5" aria-hidden="true" />
@@ -339,7 +298,6 @@ export function GalleryPage() {
               alt={activeItem.alt || activeItem.caption || 'Matt Silliman gallery photo'}
             />
             <figcaption>
-              <span>{categoryLabels[activeItem.category]}</span>
               {activeItem.caption && <strong>{activeItem.caption}</strong>}
               <div className="gallery-lightbox__details">
                 {activeItem.date && (
@@ -354,11 +312,11 @@ export function GalleryPage() {
               </div>
             </figcaption>
           </figure>
-          {filteredItems.length > 1 && (
+          {visibleItems.length > 1 && (
             <button
               type="button"
               className="gallery-lightbox__next"
-              onClick={() => setActiveIndex((activeIndex + 1) % filteredItems.length)}
+              onClick={() => setActiveIndex((activeIndex + 1) % visibleItems.length)}
               aria-label="Next gallery image"
             >
               <ArrowRight className="w-5 h-5" aria-hidden="true" />
