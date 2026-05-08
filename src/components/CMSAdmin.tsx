@@ -169,6 +169,18 @@ const inferContentSection = (value: any): keyof ContentData | null => {
     return 'gallery';
   }
 
+  if (typeof value?.title === 'string' && (value?.subtitle !== undefined || value?.description !== undefined)) {
+    return 'hero';
+  }
+
+  if (typeof value?.title === 'string' && typeof value?.content === 'string') {
+    return 'about';
+  }
+
+  if (value?.email !== undefined || value?.instagram !== undefined || value?.soundcloud !== undefined) {
+    return 'contact';
+  }
+
   if (Array.isArray(value?.items) && value.items.some((item: any) => item.soundCloudUrl !== undefined || item.embedCode !== undefined)) {
     return 'music';
   }
@@ -194,6 +206,10 @@ function toDateTimeLocal(value: string) {
 
 function fromDateTimeLocal(value: string) {
   return value ? new Date(value).toISOString() : '';
+}
+
+function addImageVersion(url: string) {
+  return `${url.split('?')[0]}?v=${Date.now()}`;
 }
 
 export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
@@ -362,8 +378,7 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
     }
   };
 
-  const saveContent = async (section: string) => {
-    setSaving(true);
+  const saveContentData = async (section: string, data: ContentData[keyof ContentData], successMessage?: string) => {
     try {
       const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-80948ead/cms/content`, {
         method: 'POST',
@@ -373,19 +388,29 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
         },
         body: JSON.stringify({
           section,
-          data: contentRef.current[section as keyof ContentData],
+          data,
         }),
       });
 
       if (response.ok) {
-        toast.success(`${section} content saved!`);
+        toast.success(successMessage || `${section} content saved!`);
+        return true;
       } else {
-        const error = await response.json();
-        toast.error(error.error || 'Failed to save content');
+        const error = await response.json().catch(() => null);
+        toast.error(error?.error || 'Failed to save content');
+        return false;
       }
     } catch (err) {
       console.error('Failed to save content:', err);
       toast.error('Failed to save content');
+      return false;
+    }
+  };
+
+  const saveContent = async (section: string) => {
+    setSaving(true);
+    try {
+      await saveContentData(section, contentRef.current[section as keyof ContentData]);
     } finally {
       setSaving(false);
     }
@@ -537,14 +562,39 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
   const uploadGalleryHeroImage = async (file: File) => {
     const imageUrl = await uploadImage('gallery-hero', file);
     if (imageUrl) {
-      updateGalleryPage('heroImageUrl', imageUrl);
+      const versionedUrl = addImageVersion(imageUrl);
+      const nextGallery = {
+        ...defaultGalleryContent,
+        ...contentRef.current.gallery,
+        heroImageUrl: versionedUrl,
+        items: contentRef.current.gallery?.items || [],
+      };
+      setContentState(prev => ({
+        ...prev,
+        gallery: nextGallery,
+      }));
+      await saveContentData('gallery', nextGallery, 'Gallery hero image uploaded and saved!');
     }
   };
 
   const uploadGalleryImage = async (index: number, file: File) => {
     const imageUrl = await uploadImage(`gallery-${index + 1}`, file);
     if (imageUrl) {
-      updateGalleryItem(index, 'imageUrl', imageUrl);
+      const items = getGalleryItems(contentRef.current);
+      items[index] = {
+        ...items[index],
+        imageUrl: addImageVersion(imageUrl),
+      };
+      const nextGallery = {
+        ...defaultGalleryContent,
+        ...contentRef.current.gallery,
+        items,
+      };
+      setContentState(prev => ({
+        ...prev,
+        gallery: nextGallery,
+      }));
+      await saveContentData('gallery', nextGallery, `Gallery image ${index + 1} uploaded and saved!`);
     }
   };
 

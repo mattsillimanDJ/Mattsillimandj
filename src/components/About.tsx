@@ -40,8 +40,8 @@ export function About() {
         const aboutContent = data.content?.find(isAboutContent);
         const aboutValue = getCmsValue(aboutContent);
         setContent({
-          title: aboutValue?.title || '',
-          content: aboutValue?.content || '',
+          title: aboutValue?.title?.trim() ? aboutValue.title : '',
+          content: aboutValue?.content?.trim() ? aboutValue.content : '',
         });
       } catch (err) {
         console.error('Failed to load about content:', err);
@@ -88,7 +88,7 @@ export function About() {
         
         {content.content && (
           <div className="space-y-6 text-lg text-white/70 leading-relaxed">
-            {content.content.split('\n\n').filter(Boolean).map((paragraph, index) => (
+            {content.content.split('\n\n').filter((paragraph) => paragraph.trim()).map((paragraph, index) => (
               <p key={index}>{paragraph}</p>
             ))}
           </div>

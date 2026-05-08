@@ -7,19 +7,92 @@
   const homeTitle = 'Matt Silliman | Feelgood House Music DJ & Producer';
   const homeDescription = 'Feelgood house music DJ and producer Matt Silliman brings deep, soulful, high-energy house music to clubs, rooftops, private events, venues, and brand activations.';
   const defaultShareImage = 'https://www.mattsillimandj.com/og-default.jpg';
-  const homeStaticHtml = `
+  const projectId = 'dbgvvizngytxuiyyiqrr';
+  const publicAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiZ3Z2aXpuZ3l0eHVpeXlpcXJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyMTIzODUsImV4cCI6MjA4MDc4ODM4NX0.tZgm7I0sbqP_Z5Ve0IoT1qobdSd_9fTybVFi6KY1_v0';
+
+  type CmsItem = {
+    key?: string;
+    value?: Record<string, unknown>;
+    title?: string;
+    subtitle?: string;
+    description?: string;
+    content?: string;
+  };
+
+  function getCmsValue(item: CmsItem | undefined) {
+    return item?.value || item || {};
+  }
+
+  function escapeHtml(value: unknown) {
+    return String(value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  async function fetchCmsContent() {
+    try {
+      const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-80948ead/cms/content`, {
+        headers: {
+          Authorization: `Bearer ${publicAnonKey}`,
+        },
+      });
+      if (!response.ok) return [];
+      const data = await response.json();
+      return Array.isArray(data.content) ? data.content : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function findHeroContent(items: CmsItem[]) {
+    return getCmsValue(items.find((item) => {
+      const value = getCmsValue(item);
+      return item?.key === 'cms_content_hero'
+        || (typeof value.title === 'string' && (value.subtitle !== undefined || value.description !== undefined));
+    }));
+  }
+
+  function findAboutContent(items: CmsItem[]) {
+    return getCmsValue(items.find((item) => {
+      const value = getCmsValue(item);
+      return item?.key === 'cms_content_about'
+        || (typeof value.title === 'string' && typeof value.content === 'string');
+    }));
+  }
+
+  function renderParagraphs(value: unknown) {
+    return String(value || '')
+      .split('\n\n')
+      .filter((paragraph) => paragraph.trim())
+      .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
+      .join('');
+  }
+
+  function homeStaticHtml(cmsItems: CmsItem[]) {
+    const hero = findHeroContent(cmsItems);
+    const about = findAboutContent(cmsItems);
+    const heroTitle = String(hero.title || '').trim();
+    const heroSubtitle = String(hero.subtitle || '').trim();
+    const heroDescription = String(hero.description || '').trim();
+    const aboutTitle = String(about.title || '').trim();
+    const aboutContent = renderParagraphs(about.content);
+
+    return `
         <div class="bg-black text-white min-h-screen">
-          <section id="hero" class="min-h-screen flex items-center justify-center relative overflow-hidden">
+          <section id="hero" class="min-h-screen flex items-start justify-center relative overflow-hidden pt-[25vh]">
             <div class="relative z-10 text-center px-6">
-              <h1 class="text-7xl md:text-7xl lg:text-8xl mb-6 tracking-tight">MATT SILLIMAN</h1>
-              <p class="text-xl md:text-2xl text-white/60 tracking-widest uppercase">Feelgood house for rooms that want to move.</p>
-              <p class="max-w-2xl mx-auto mt-6 text-lg md:text-xl text-white/70 leading-relaxed">Deep, soulful, high-energy house music for clubs, rooftops, private events, venues, and brand activations.</p>
+              ${heroTitle ? `<h1 class="text-7xl md:text-7xl lg:text-8xl tracking-tight">${escapeHtml(heroTitle)}</h1>` : ''}
+              ${heroSubtitle ? `<p class="mt-6 text-xl md:text-2xl text-white/60 tracking-widest uppercase">${escapeHtml(heroSubtitle)}</p>` : ''}
+              ${heroDescription ? `<p class="max-w-2xl mx-auto mt-6 text-lg md:text-xl text-white/70 leading-relaxed">${escapeHtml(heroDescription)}</p>` : ''}
             </div>
           </section>
           <section id="about" class="min-h-screen flex items-center py-24 px-6 relative">
             <div class="max-w-4xl mx-auto relative z-10">
-              <h2 class="text-5xl md:text-6xl mb-12 tracking-tight">About Matt Silliman</h2>
-              <p>Matt Silliman is a feelgood house music DJ and producer creating deep, soulful, high-energy house for clubs, rooftops, private events, venues, brand activations, and music-forward rooms. Atlanta-born and built for rooms that want to move, his sets are warm, polished, and rooted in connection.</p>
+              ${aboutTitle ? `<h2 class="text-5xl md:text-6xl mb-12 tracking-tight">${escapeHtml(aboutTitle)}</h2>` : ''}
+              ${aboutContent ? `<div class="space-y-6 text-lg text-white/70 leading-relaxed">${aboutContent}</div>` : ''}
             </div>
           </section>
           <section id="captains-of-revelry" class="relative overflow-hidden bg-neutral-950 px-6 py-24">
@@ -43,16 +116,18 @@
             </div>
           </section>
         </div>`;
+  }
 
   function setTag(html: string, selector: string, value: string) {
     return html.replace(selector, value);
   }
 
-  function writePrerenderedRoutes() {
+  async function writePrerenderedRoutes() {
     const buildDir = path.resolve(__dirname, 'build');
     const indexPath = path.join(buildDir, 'index.html');
     const baseHtml = readFileSync(indexPath, 'utf8');
-    const homeHtml = baseHtml.replace('<div id="root"></div>', `<div id="root">${homeStaticHtml}</div>`);
+    const cmsItems = await fetchCmsContent();
+    const homeHtml = baseHtml.replace('<div id="root"></div>', `<div id="root">${homeStaticHtml(cmsItems)}</div>`);
 
     writeFileSync(indexPath, homeHtml);
 
@@ -91,8 +166,8 @@
   function staticShellPrerender() {
     return {
       name: 'static-shell-prerender',
-      closeBundle() {
-        writePrerenderedRoutes();
+      async closeBundle() {
+        await writePrerenderedRoutes();
       },
     };
   }
