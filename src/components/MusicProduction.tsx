@@ -159,7 +159,7 @@ export function MusicProduction() {
   const productions = [
     {
       title: 'Originals',
-      description: 'Feelgood house originals shaped around deep grooves, vocal moments, warmth, and dance floor momentum.',
+      description: 'From tech house bangers to deep house late-night grooves, here are some of my latest releases.',
       icon: Music,
       scrollTo: 'recent-releases',
       category: 'originals' as PublicMusicCategory,
