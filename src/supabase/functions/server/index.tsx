@@ -114,6 +114,24 @@ function getServiceClient() {
   );
 }
 
+async function triggerDeployHook(reason: string) {
+  const deployHookUrl = Deno.env.get('CLOUDFLARE_DEPLOY_HOOK_URL');
+
+  if (!deployHookUrl) {
+    console.log(`Deploy hook skipped for ${reason}: CLOUDFLARE_DEPLOY_HOOK_URL is not configured`);
+    return;
+  }
+
+  try {
+    const response = await fetch(deployHookUrl, { method: 'POST' });
+    if (!response.ok) {
+      console.log(`Deploy hook failed for ${reason}: ${response.status} ${await response.text()}`);
+    }
+  } catch (error) {
+    console.log(`Deploy hook error for ${reason}: ${error}`);
+  }
+}
+
 // Public Shows
 app.get("/make-server-80948ead/shows", async (c) => {
   try {
@@ -176,6 +194,8 @@ app.post("/make-server-80948ead/cms/shows", async (c) => {
       console.log(`Show save error: ${error.message}`);
       return c.json({ error: 'Failed to save show', details: error.message }, 500);
     }
+
+    await triggerDeployHook('show save');
 
     return c.json({ success: true, show: data });
   } catch (error) {
@@ -294,6 +314,7 @@ app.post("/make-server-80948ead/cms/content", async (c) => {
 
     const { section, data } = await c.req.json();
     await kv.set(`cms_content_${section}`, data);
+    await triggerDeployHook(`content update: ${section}`);
     
     return c.json({ success: true });
   } catch (error) {
@@ -397,6 +418,7 @@ app.post("/make-server-80948ead/cms/images", async (c) => {
 
     const { imageName, url } = await c.req.json();
     await kv.set(`cms_image_${imageName}`, url);
+    await triggerDeployHook(`image update: ${imageName}`);
     
     return c.json({ success: true });
   } catch (error) {
