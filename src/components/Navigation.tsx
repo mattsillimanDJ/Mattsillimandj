@@ -51,7 +51,9 @@ export function Navigation({ activeSection }: NavigationProps) {
 
   const navItems = [
     { id: 'about', label: 'About' },
+    { id: 'captains-of-revelry', label: 'Captains' },
     { id: 'music-production', label: 'Production and Mixes' },
+    { id: 'shows', label: 'Shows' },
     { id: 'gallery', label: 'Gallery', page: 'gallery' },
     { id: 'feed', label: 'Feed' },
     { id: 'contact', label: 'Contact' },

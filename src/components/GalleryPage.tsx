@@ -46,6 +46,7 @@ const defaultGallery: GalleryContent = {
   ctaButtonUrl: '/#contact',
   items: [],
 };
+const defaultShareImage = 'https://www.mattsillimandj.com/og-default.jpg';
 
 const filters: Array<{ value: 'all' | GalleryCategory; label: string }> = [
   { value: 'all', label: 'All' },
@@ -67,6 +68,13 @@ function setMetaTag(selector: string, attribute: 'content' | 'href', value: stri
   if (tag) {
     tag.setAttribute(attribute, value);
   }
+}
+
+function getGalleryShareImage(gallery: GalleryContent) {
+  return gallery.heroImageUrl
+    || gallery.items.find((item) => item.featured && item.imageUrl && item.hidden !== true)?.imageUrl
+    || gallery.items.find((item) => item.imageUrl && item.hidden !== true)?.imageUrl
+    || defaultShareImage;
 }
 
 function normalizeGallery(raw: Partial<GalleryContent> | undefined): GalleryContent {
@@ -141,15 +149,21 @@ export function GalleryPage() {
     setMetaTag('meta[property="og:url"]', 'content', 'https://www.mattsillimandj.com/gallery');
     setMetaTag('meta[property="og:title"]', 'content', gallery.seoTitle || defaultGallery.seoTitle);
     setMetaTag('meta[property="og:description"]', 'content', gallery.seoDescription || defaultGallery.seoDescription);
+    setMetaTag('meta[property="og:image"]', 'content', getGalleryShareImage(gallery));
+    setMetaTag('meta[property="og:image:alt"]', 'content', gallery.heroAlt || defaultGallery.heroAlt);
     setMetaTag('meta[name="twitter:title"]', 'content', gallery.seoTitle || defaultGallery.seoTitle);
     setMetaTag('meta[name="twitter:description"]', 'content', gallery.seoDescription || defaultGallery.seoDescription);
+    setMetaTag('meta[name="twitter:image"]', 'content', getGalleryShareImage(gallery));
 
     return () => {
       document.title = 'Matt Silliman | Feelgood House Music DJ & Producer';
       setMetaTag('meta[name="description"]', 'content', 'Feelgood house music DJ and producer Matt Silliman brings deep, soulful, high-energy house music to clubs, rooftops, private events, venues, and brand activations.');
       setMetaTag('link[rel="canonical"]', 'href', 'https://www.mattsillimandj.com/');
+      setMetaTag('meta[property="og:image"]', 'content', defaultShareImage);
+      setMetaTag('meta[property="og:image:alt"]', 'content', 'Matt Silliman performing live');
+      setMetaTag('meta[name="twitter:image"]', 'content', defaultShareImage);
     };
-  }, [gallery.seoDescription, gallery.seoTitle]);
+  }, [gallery]);
 
   const visibleItems = useMemo(() => (
     gallery.items

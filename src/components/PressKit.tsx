@@ -19,16 +19,20 @@ const homeUrl = 'https://www.mattsillimandj.com/';
 const pressTitle = 'Press Kit | Matt Silliman DJ';
 const pressDescription = 'Press kit, artist bio, music, gallery, booking contact, and press links for feelgood house music DJ and producer Matt Silliman.';
 const pressUrl = 'https://www.mattsillimandj.com/press';
+const defaultShareImage = 'https://www.mattsillimandj.com/og-default.jpg';
 
-function setPageMetadata(title: string, description: string, url: string) {
+function setPageMetadata(title: string, description: string, url: string, imageUrl = defaultShareImage) {
   document.title = title;
   setMetaTag('meta[name="description"]', 'content', description);
   setMetaTag('link[rel="canonical"]', 'href', url);
   setMetaTag('meta[property="og:url"]', 'content', url);
   setMetaTag('meta[property="og:title"]', 'content', title);
   setMetaTag('meta[property="og:description"]', 'content', description);
+  setMetaTag('meta[property="og:image"]', 'content', imageUrl);
+  setMetaTag('meta[property="og:image:alt"]', 'content', 'Matt Silliman performing live');
   setMetaTag('meta[name="twitter:title"]', 'content', title);
   setMetaTag('meta[name="twitter:description"]', 'content', description);
+  setMetaTag('meta[name="twitter:image"]', 'content', imageUrl);
 }
 
 export function PressKit({ isPage = false }: PressKitProps) {

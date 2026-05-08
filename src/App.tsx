@@ -2,10 +2,12 @@ import { Suspense, lazy, useState, useEffect } from 'react';
 import { Navigation } from './components/Navigation';
 import { Hero } from './components/Hero';
 import { About } from './components/About';
+import { CaptainsOfRevelry } from './components/CaptainsOfRevelry';
 import { MusicProduction } from './components/MusicProduction';
+import { Shows } from './components/Shows';
 import { Feed } from './components/Feed';
+import { Newsletter } from './components/Newsletter';
 import { Contact } from './components/Contact';
-import { CMS } from './components/CMS';
 
 const GalleryPage = lazy(() => (
   import('./components/GalleryPage').then((module) => ({ default: module.GalleryPage }))
@@ -13,10 +15,16 @@ const GalleryPage = lazy(() => (
 const PressKit = lazy(() => (
   import('./components/PressKit').then((module) => ({ default: module.PressKit }))
 ));
+const ShowsPage = lazy(() => (
+  import('./components/ShowsPage').then((module) => ({ default: module.ShowsPage }))
+));
+const CMS = lazy(() => (
+  import('./components/CMS').then((module) => ({ default: module.CMS }))
+));
 
 export default function App() {
   const [activeSection, setActiveSection] = useState('hero');
-  const [currentPage, setCurrentPage] = useState<'home' | 'gallery' | 'press' | 'cms'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'gallery' | 'press' | 'shows' | 'cms'>('home');
 
   useEffect(() => {
     const setPageFromPath = () => {
@@ -29,6 +37,9 @@ export default function App() {
       } else if (path === '/press') {
         setCurrentPage('press');
         setActiveSection('press-kit');
+      } else if (path === '/shows') {
+        setCurrentPage('shows');
+        setActiveSection('shows');
       } else {
         setCurrentPage('home');
       }
@@ -44,7 +55,7 @@ export default function App() {
     if (currentPage !== 'home') return;
 
     const handleScroll = () => {
-      const sections = ['hero', 'about', 'music-production', 'feed', 'contact'];
+      const sections = ['hero', 'about', 'captains-of-revelry', 'music-production', 'shows', 'feed', 'newsletter', 'contact'];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
@@ -64,7 +75,11 @@ export default function App() {
   }, [currentPage]);
 
   if (currentPage === 'cms') {
-    return <CMS />;
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center">Loading CMS...</div>}>
+        <CMS />
+      </Suspense>
+    );
   }
 
   if (currentPage === 'gallery') {
@@ -89,13 +104,27 @@ export default function App() {
     );
   }
 
+  if (currentPage === 'shows') {
+    return (
+      <div className="bg-black text-white min-h-screen">
+        <Navigation activeSection="shows" />
+        <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center">Loading shows...</div>}>
+          <ShowsPage />
+        </Suspense>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-black text-white min-h-screen">
       <Navigation activeSection={activeSection} />
       <Hero />
       <About />
+      <CaptainsOfRevelry />
       <MusicProduction />
+      <Shows />
       <Feed />
+      <Newsletter />
       <Contact />
     </div>
   );

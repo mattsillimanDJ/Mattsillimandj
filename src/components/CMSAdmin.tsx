@@ -8,7 +8,7 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Upload, LogOut, Save, Image as ImageIcon } from 'lucide-react';
+import { Upload, LogOut, Save, Image as ImageIcon, Plus, Trash2, Download } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
 
 interface CMSAdminProps {
@@ -63,6 +63,33 @@ interface GalleryContent {
   items: GalleryItem[];
 }
 
+interface ShowItem {
+  id: string;
+  date: string;
+  venue: string;
+  city: string;
+  country: string;
+  lineup: string;
+  ticketUrl: string;
+  status: 'upcoming' | 'past';
+  featured: boolean;
+}
+
+interface CaptainsContent {
+  eyebrow: string;
+  heading: string;
+  body: string;
+  ctaLabel: string;
+  ctaUrl: string;
+}
+
+interface Subscriber {
+  id: string;
+  email: string;
+  source: string;
+  created_at: string;
+}
+
 interface ContentData {
   hero?: {
     title: string;
@@ -73,6 +100,7 @@ interface ContentData {
     title: string;
     content: string;
   };
+  captains?: CaptainsContent;
   contact?: {
     title: string;
     email: string;
@@ -96,6 +124,7 @@ interface ImageData {
   portrait?: string;
   aboutBg?: string;
   contactBg?: string;
+  captainsBg?: string;
 }
 
 const normalizeMusicCategory = (category?: string): MusicCategory => (
@@ -123,6 +152,15 @@ const defaultGalleryContent: GalleryContent = {
   items: [],
 };
 
+const defaultCaptainsContent: CaptainsContent = {
+  eyebrow: 'EXPERIENTIAL MUSIC BRAND',
+  heading: 'Captains of Revelry',
+  body: 'Boat parties, warehouse takeovers, destination events. Founded by Matt to bring great people together, play great music, and let the night take care of the rest.',
+  ctaLabel: 'Explore Captains of Revelry',
+  // TODO: Replace with the confirmed Captains of Revelry website URL.
+  ctaUrl: '#',
+};
+
 const normalizeGalleryCategory = (category?: string): GalleryCategory => (
   galleryCategories.some((item) => item.value === category) ? category as GalleryCategory : 'live-sets'
 );
@@ -136,6 +174,10 @@ const inferContentSection = (value: any): keyof ContentData | null => {
     return 'music';
   }
 
+  if (value?.heading === defaultCaptainsContent.heading || value?.ctaLabel !== undefined) {
+    return 'captains';
+  }
+
   if (value?.embedCode !== undefined || (Array.isArray(value?.items) && value.items.some((item: any) => item.permalink !== undefined))) {
     return 'feed';
   }
@@ -143,10 +185,24 @@ const inferContentSection = (value: any): keyof ContentData | null => {
   return null;
 };
 
+function toDateTimeLocal(value: string) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return offsetDate.toISOString().slice(0, 16);
+}
+
+function fromDateTimeLocal(value: string) {
+  return value ? new Date(value).toISOString() : '';
+}
+
 export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
   const [content, setContent] = useState<ContentData>({});
   const contentRef = useRef<ContentData>({});
   const [images, setImages] = useState<ImageData>({});
+  const [shows, setShows] = useState<ShowItem[]>([]);
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState<string | null>(null);
@@ -210,6 +266,8 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
   useEffect(() => {
     loadContent();
     loadImages();
+    loadShows();
+    loadSubscribers();
   }, []);
 
   const loadContent = async () => {
@@ -257,6 +315,51 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
       setImages(normalizeCmsImages(data.images));
     } catch (err) {
       console.error('Failed to load images:', err);
+    }
+  };
+
+  const loadShows = async () => {
+    try {
+      const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-80948ead/shows`, {
+        headers: {
+          'Authorization': `Bearer ${publicAnonKey}`,
+        },
+      });
+
+      const data = await response.json();
+      setShows((data.shows || []).map((show: any) => ({
+        id: show.id,
+        date: show.date || '',
+        venue: show.venue || '',
+        city: show.city || '',
+        country: show.country || 'USA',
+        lineup: show.lineup || '',
+        ticketUrl: show.ticketUrl || '',
+        status: show.status === 'past' ? 'past' : 'upcoming',
+        featured: Boolean(show.featured),
+      })));
+    } catch (err) {
+      console.error('Failed to load shows:', err);
+    }
+  };
+
+  const loadSubscribers = async () => {
+    try {
+      const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-80948ead/cms/subscribers`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) return [];
+
+      const data = await response.json();
+      const nextSubscribers = data.subscribers || [];
+      setSubscribers(nextSubscribers);
+      return nextSubscribers;
+    } catch (err) {
+      console.error('Failed to load subscribers:', err);
+      return [];
     }
   };
 
@@ -446,6 +549,109 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
     }
   };
 
+  const addShow = () => {
+    setShows(prev => [
+      {
+        id: crypto.randomUUID(),
+        date: '',
+        venue: '',
+        city: '',
+        country: 'USA',
+        lineup: '',
+        ticketUrl: '',
+        status: 'upcoming',
+        featured: false,
+      },
+      ...prev,
+    ]);
+  };
+
+  const updateShow = (index: number, field: keyof ShowItem, value: string | boolean) => {
+    setShows(prev => {
+      const next = [...prev];
+      next[index] = {
+        ...next[index],
+        [field]: value,
+      };
+      return next;
+    });
+  };
+
+  const saveShow = async (show: ShowItem) => {
+    setSaving(true);
+    try {
+      const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-80948ead/cms/shows`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(show),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        toast.success('Show saved!');
+        await loadShows();
+      } else {
+        toast.error(data.error || 'Failed to save show');
+      }
+    } catch (err) {
+      console.error('Failed to save show:', err);
+      toast.error('Failed to save show');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteShow = async (id: string) => {
+    if (!confirm('Delete this show?')) return;
+
+    try {
+      const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-80948ead/cms/shows/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        toast.success('Show deleted');
+        await loadShows();
+      } else {
+        const data = await response.json();
+        toast.error(data.error || 'Failed to delete show');
+      }
+    } catch (err) {
+      console.error('Failed to delete show:', err);
+      toast.error('Failed to delete show');
+    }
+  };
+
+  const exportSubscribers = async () => {
+    const nextSubscribers = await loadSubscribers();
+    const csvRows = [
+      ['email', 'source', 'created_at'],
+      ...nextSubscribers.map((subscriber: Subscriber) => [
+        subscriber.email,
+        subscriber.source,
+        subscriber.created_at,
+      ]),
+    ];
+    const csv = csvRows
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'subscribers.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -455,6 +661,10 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
   }
 
   const gallery = getGalleryContent();
+  const captains = {
+    ...defaultCaptainsContent,
+    ...content.captains,
+  };
 
   return (
     <div className="min-h-screen bg-black p-4">
@@ -471,10 +681,13 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
           <TabsList className="bg-zinc-900">
             <TabsTrigger value="hero">Hero</TabsTrigger>
             <TabsTrigger value="about">About</TabsTrigger>
+            <TabsTrigger value="captains">Captains</TabsTrigger>
             <TabsTrigger value="contact">Contact</TabsTrigger>
             <TabsTrigger value="feed">Feed</TabsTrigger>
             <TabsTrigger value="music">Music</TabsTrigger>
+            <TabsTrigger value="shows">Shows</TabsTrigger>
             <TabsTrigger value="gallery">Gallery</TabsTrigger>
+            <TabsTrigger value="subscribers">Subscribers</TabsTrigger>
             <TabsTrigger value="images">Images</TabsTrigger>
           </TabsList>
 
@@ -555,6 +768,96 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                 <Button onClick={() => saveContent('about')} disabled={saving}>
                   <Save className="mr-2 h-4 w-4" />
                   {saving ? 'Saving...' : 'Save About Content'}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Captains of Revelry Section */}
+          <TabsContent value="captains">
+            <Card className="bg-zinc-900 border-zinc-800">
+              <CardHeader>
+                <CardTitle className="text-white">Captains of Revelry</CardTitle>
+                <CardDescription>Edit the homepage Captains of Revelry callout block</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="captains-eyebrow" className="text-white">Eyebrow</Label>
+                    <Input
+                      id="captains-eyebrow"
+                      value={captains.eyebrow}
+                      onChange={(e) => updateContent('captains', 'eyebrow', e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="captains-heading" className="text-white">Heading</Label>
+                    <Input
+                      id="captains-heading"
+                      value={captains.heading}
+                      onChange={(e) => updateContent('captains', 'heading', e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="captains-body" className="text-white">Body</Label>
+                  <Textarea
+                    id="captains-body"
+                    value={captains.body}
+                    onChange={(e) => updateContent('captains', 'body', e.target.value)}
+                    className="bg-zinc-800 border-zinc-700 text-white min-h-[120px]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="captains-cta-label" className="text-white">CTA Label</Label>
+                    <Input
+                      id="captains-cta-label"
+                      value={captains.ctaLabel}
+                      onChange={(e) => updateContent('captains', 'ctaLabel', e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="captains-cta-url" className="text-white">CTA URL</Label>
+                    <Input
+                      id="captains-cta-url"
+                      value={captains.ctaUrl}
+                      onChange={(e) => updateContent('captains', 'ctaUrl', e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white"
+                      placeholder="#"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3 border border-zinc-800 rounded-lg p-4">
+                  <Label className="text-white">Background Image</Label>
+                  {images.captainsBg ? (
+                    <img src={images.captainsBg} alt="Captains of Revelry background" className="h-40 w-full rounded object-cover bg-zinc-800" />
+                  ) : (
+                    <div className="h-40 w-full rounded bg-zinc-800 flex items-center justify-center">
+                      <ImageIcon className="h-8 w-8 text-white/40" />
+                    </div>
+                  )}
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) uploadImage('captainsBg', file);
+                    }}
+                    className="bg-zinc-800 border-zinc-700 text-white"
+                    disabled={uploading === 'captainsBg'}
+                  />
+                </div>
+
+                <Button onClick={() => saveContent('captains')} disabled={saving}>
+                  <Save className="mr-2 h-4 w-4" />
+                  {saving ? 'Saving...' : 'Save Captains Content'}
                 </Button>
               </CardContent>
             </Card>
@@ -803,6 +1106,139 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                   <Save className="mr-2 h-4 w-4" />
                   {saving ? 'Saving...' : 'Save Music Embeds'}
                 </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Shows Section */}
+          <TabsContent value="shows">
+            <Card className="bg-zinc-900 border-zinc-800">
+              <CardHeader>
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <CardTitle className="text-white">Shows</CardTitle>
+                    <CardDescription>Manage upcoming and past live dates</CardDescription>
+                  </div>
+                  <Button onClick={addShow}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Show
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {shows.length === 0 ? (
+                  <p className="rounded-lg border border-zinc-800 p-4 text-zinc-400">
+                    No shows yet. Add a show when Matt is ready to publish dates.
+                  </p>
+                ) : (
+                  shows.map((show, index) => (
+                    <div key={show.id} className="space-y-4 rounded-lg border border-zinc-800 p-4">
+                      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                        <Label className="text-white">Show {index + 1}</Label>
+                        <div className="flex gap-2">
+                          <Button onClick={() => saveShow(show)} disabled={saving} size="sm">
+                            <Save className="mr-2 h-4 w-4" />
+                            Save
+                          </Button>
+                          <Button onClick={() => deleteShow(show.id)} variant="outline" size="sm">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor={`show-date-${show.id}`} className="text-white">Date</Label>
+                          <Input
+                            id={`show-date-${show.id}`}
+                            type="datetime-local"
+                            value={toDateTimeLocal(show.date)}
+                            onChange={(e) => updateShow(index, 'date', fromDateTimeLocal(e.target.value))}
+                            className="bg-zinc-800 border-zinc-700 text-white"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor={`show-status-${show.id}`} className="text-white">Status</Label>
+                          <select
+                            id={`show-status-${show.id}`}
+                            value={show.status}
+                            onChange={(e) => updateShow(index, 'status', e.target.value as ShowItem['status'])}
+                            className="w-full rounded-md bg-zinc-800 border border-zinc-700 px-3 py-2 text-white"
+                          >
+                            <option value="upcoming">Upcoming</option>
+                            <option value="past">Past</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor={`show-venue-${show.id}`} className="text-white">Venue</Label>
+                          <Input
+                            id={`show-venue-${show.id}`}
+                            value={show.venue}
+                            onChange={(e) => updateShow(index, 'venue', e.target.value)}
+                            className="bg-zinc-800 border-zinc-700 text-white"
+                            placeholder="Terminal West"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor={`show-city-${show.id}`} className="text-white">City</Label>
+                          <Input
+                            id={`show-city-${show.id}`}
+                            value={show.city}
+                            onChange={(e) => updateShow(index, 'city', e.target.value)}
+                            className="bg-zinc-800 border-zinc-700 text-white"
+                            placeholder="Atlanta"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor={`show-country-${show.id}`} className="text-white">Country</Label>
+                          <Input
+                            id={`show-country-${show.id}`}
+                            value={show.country}
+                            onChange={(e) => updateShow(index, 'country', e.target.value)}
+                            className="bg-zinc-800 border-zinc-700 text-white"
+                            placeholder="USA"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`show-lineup-${show.id}`} className="text-white">Lineup</Label>
+                        <Input
+                          id={`show-lineup-${show.id}`}
+                          value={show.lineup}
+                          onChange={(e) => updateShow(index, 'lineup', e.target.value)}
+                          className="bg-zinc-800 border-zinc-700 text-white"
+                          placeholder="Optional, comma-separated"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor={`show-ticket-${show.id}`} className="text-white">Ticket URL</Label>
+                          <Input
+                            id={`show-ticket-${show.id}`}
+                            value={show.ticketUrl}
+                            onChange={(e) => updateShow(index, 'ticketUrl', e.target.value)}
+                            className="bg-zinc-800 border-zinc-700 text-white"
+                            placeholder="https://..."
+                          />
+                        </div>
+                        <label className="flex items-end gap-2 pb-2 text-white">
+                          <input
+                            type="checkbox"
+                            checked={show.featured}
+                            onChange={(e) => updateShow(index, 'featured', e.target.checked)}
+                          />
+                          Featured
+                        </label>
+                      </div>
+                    </div>
+                  ))
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -1081,6 +1517,25 @@ export function CMSAdmin({ accessToken, onLogout }: CMSAdminProps) {
                 <Button onClick={() => saveContent('gallery')} disabled={saving || uploading !== null}>
                   <Save className="mr-2 h-4 w-4" />
                   {saving ? 'Saving...' : uploading ? 'Upload finishing...' : 'Save Gallery Page'}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Subscribers Section */}
+          <TabsContent value="subscribers">
+            <Card className="bg-zinc-900 border-zinc-800">
+              <CardHeader>
+                <CardTitle className="text-white">Subscribers</CardTitle>
+                <CardDescription>Export newsletter signups as a CSV</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-zinc-400">
+                  {subscribers.length} subscriber{subscribers.length === 1 ? '' : 's'} captured.
+                </p>
+                <Button onClick={exportSubscribers}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Export CSV
                 </Button>
               </CardContent>
             </Card>
