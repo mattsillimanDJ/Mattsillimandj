@@ -114,9 +114,13 @@
           <section id="shows" class="relative overflow-hidden bg-black px-6" style="padding-top: 2.5rem; padding-bottom: 6rem; background-image: url('/shows-background.png'); background-size: cover; background-position: center; scroll-margin-top: 5rem;">
             <div class="absolute inset-0 bg-black/60"></div>
             <div class="relative z-10 max-w-6xl mx-auto">
-              <p class="mb-4 text-sm uppercase tracking-widest text-white/50">Live Dates</p>
-              <h2 class="text-5xl md:text-6xl tracking-tight">Shows</h2>
-              <p class="border-t border-white/10 py-6 mt-12 text-white/50">Shows image will appear here once uploaded in the CMS.</p>
+              <div class="mb-12">
+                <div>
+                  <p class="mb-4 text-sm uppercase tracking-widest text-white/50">Live Dates</p>
+                  <h2 class="text-5xl md:text-6xl tracking-tight">Shows</h2>
+                </div>
+              </div>
+              <p class="border-t border-white/10 py-6 text-white/50">Shows image will appear here once uploaded in the CMS.</p>
             </div>
           </section>
           <section id="captains-of-revelry" class="relative overflow-hidden bg-neutral-950 px-6" style="min-height: 80vh; padding-top: 10rem; padding-bottom: 10rem; scroll-margin-top: 5rem;">
