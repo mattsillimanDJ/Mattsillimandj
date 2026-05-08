@@ -74,7 +74,7 @@ export function Feed() {
   }, []);
 
   return (
-    <section id="feed" className="min-h-screen bg-black py-20 px-6">
+    <section id="feed" className="bg-black px-6" style={{ paddingTop: '5rem', paddingBottom: '1.5rem' }}>
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-center gap-4 mb-5">
           <Instagram className="w-8 h-8 text-white/60" />
