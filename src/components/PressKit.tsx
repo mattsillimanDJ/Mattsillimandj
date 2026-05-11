@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { ArrowUpRight, FileText, Image, Mail, Music2 } from 'lucide-react';
-import { EPK_PDF_URL, pressLinks } from './pressKitContent';
+import { EPK_PDF_URL, PUBLIC_BOOKING_EMAIL, pressLinks } from './pressKitContent';
 
 interface PressKitProps {
   isPage?: boolean;
@@ -143,14 +143,13 @@ export function PressKit({ isPage = false }: PressKitProps) {
             <p className="text-white/50">
               For bookings, clubs, rooftops, private events, venues, brand activations, and media inquiries.
             </p>
-            <button
-              type="button"
-              onClick={() => scrollToSection('contact')}
+            <a
+              href={`mailto:${PUBLIC_BOOKING_EMAIL}`}
               className="mt-6 inline-flex items-center gap-2 border-b border-white/40 pb-1 text-sm uppercase tracking-widest text-white transition-colors hover:border-white/20 hover:text-white/60"
             >
-              Booking Contact
+              {PUBLIC_BOOKING_EMAIL}
               <ArrowUpRight className="w-4 h-4" />
-            </button>
+            </a>
           </section>
         </div>
       </div>

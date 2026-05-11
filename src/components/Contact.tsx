@@ -3,19 +3,20 @@ import type { MouseEvent } from 'react';
 import { ArrowUpRight, FileText, Instagram, Mail, Music2, Facebook, Video } from 'lucide-react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { normalizeCmsImages } from '../utils/cmsImages';
-import { EPK_PDF_URL, pressLinks } from './pressKitContent';
+import { EPK_PDF_URL, PUBLIC_BOOKING_EMAIL, pressLinks } from './pressKitContent';
 
 function normalizeContactContent<T extends { title?: string }>(raw: T): T {
   return {
     ...raw,
     title: 'Booking, Contact, Press & Socials',
+    email: PUBLIC_BOOKING_EMAIL,
   };
 }
 
 export function Contact() {
   const [content, setContent] = useState({
     title: 'Booking, Contact, Press & Socials',
-    email: 'mattsilliman@gmail.com',
+    email: PUBLIC_BOOKING_EMAIL,
     instagram: '@mattsilliman_dj',
     soundcloud: 'mattsilliman',
     facebook: 'mattsilliman',
@@ -99,7 +100,7 @@ export function Contact() {
               <h3 className="text-2xl">Email / Booking</h3>
             </div>
             <a 
-              href={`mailto:${content.email}`} 
+              href={`mailto:${PUBLIC_BOOKING_EMAIL}`} 
               className="text-xl text-white/60 hover:text-white transition-colors"
             >
               {content.email}
