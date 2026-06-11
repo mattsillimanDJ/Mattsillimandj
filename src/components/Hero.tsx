@@ -1,6 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { normalizeCmsImages } from '../utils/cmsImages';
+import { SplitText } from '../motion/SplitText';
+import { prefersReducedMotion } from '../motion/MotionProvider';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface HeroContent {
   title: string;
@@ -38,6 +44,56 @@ function isHeroContent(item: any) {
 export function Hero() {
   const [content, setContent] = useState<HeroContent>(emptyHeroContent);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
+
+  // Slow cinematic zoom on the hero image once it loads
+  useEffect(() => {
+    const img = imageRef.current;
+    if (!img || !imageUrl || prefersReducedMotion()) return;
+    const tween = gsap.fromTo(
+      img,
+      { scale: 1.12, opacity: 0 },
+      { scale: 1, opacity: 0.7, duration: 2.4, ease: 'power2.out' },
+    );
+    return () => { tween.kill(); };
+  }, [imageUrl]);
+
+  // Scroll-linked parallax: hero content drifts up and fades as you scroll past
+  useEffect(() => {
+    const section = sectionRef.current;
+    const inner = contentRef.current;
+    if (!section || !inner || prefersReducedMotion()) return;
+
+    const ctx = gsap.context(() => {
+      gsap.to(inner, {
+        yPercent: -40,
+        opacity: 0,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: section,
+          start: 'top top',
+          end: 'bottom 40%',
+          scrub: true,
+        },
+      });
+      if (imageRef.current) {
+        gsap.to(imageRef.current, {
+          yPercent: 12,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: true,
+          },
+        });
+      }
+    }, section);
+
+    return () => ctx.revert();
+  }, [imageUrl]);
 
   useEffect(() => {
     // Fetch content from backend
@@ -79,12 +135,12 @@ export function Hero() {
   }, []);
 
   return (
-    <section id="hero" style={{ paddingTop: "45vh" }} className="min-h-screen flex items-start justify-center relative overflow-hidden">
+    <section ref={sectionRef} id="hero" style={{ paddingTop: "45vh" }} className="min-h-screen flex items-start justify-center relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-black via-black/95 to-black"></div>
-      
+
       {/* Portrait Image - positioned right of center */}
       {imageUrl && (
-        <div className="absolute top-1/2 -translate-y-1/2 w-[48rem] h-[48rem] md:w-[60rem] md:h-[60rem] lg:w-[72rem] lg:h-[72rem] opacity-70 pointer-events-none" style={{ left: 'calc(50% - 5.5in)' }}>
+        <div ref={imageRef} className="hero-zoom absolute top-1/2 -translate-y-1/2 w-[48rem] h-[48rem] md:w-[60rem] md:h-[60rem] lg:w-[72rem] lg:h-[72rem] opacity-70 pointer-events-none" style={{ left: 'calc(50% - 5.5in)' }}>
           <img
             src={imageUrl}
             alt="Matt Silliman, feelgood house music DJ and producer"
@@ -92,17 +148,21 @@ export function Hero() {
           />
         </div>
       )}
-      
-      <div className="relative z-10 text-center px-6">
+
+      <div ref={contentRef} className="relative z-10 text-center px-6">
         {content.title && (
           <h1 className="text-7xl md:text-7xl lg:text-8xl tracking-tight">
-            {content.title}
+            <SplitText text={content.title} />
           </h1>
         )}
         {content.subtitle && (
-          <p className="mt-6 text-xl md:text-2xl text-white/60 tracking-widest uppercase">
-            {content.subtitle}
-          </p>
+          <SplitText
+            as="p"
+            text={content.subtitle}
+            className="mt-6 text-xl md:text-2xl text-white/60 tracking-widest uppercase"
+            stagger={0.02}
+            delay={0.7}
+          />
         )}
         {content.description && (
           <p className="max-w-2xl mx-auto mt-6 text-lg md:text-xl text-white/70 leading-relaxed">
@@ -110,7 +170,7 @@ export function Hero() {
           </p>
         )}
       </div>
-      
+
       <div className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce">
         <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
           <div className="w-1.5 h-1.5 bg-white/30 rounded-full"></div>

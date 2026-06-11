@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { normalizeCmsImages } from '../utils/cmsImages';
+import { Reveal } from '../motion/Reveal';
+import { ParallaxBg } from '../motion/Parallax';
 
 interface AboutContent {
   title: string;
@@ -71,27 +73,24 @@ export function About() {
   }, []);
 
   return (
-    <section id="about" className="min-h-screen flex items-center py-24 px-6 relative">
-      {/* Background Image */}
-      {bgImageUrl && (
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-45"
-          style={{ backgroundImage: `url(${bgImageUrl})` }}
-        />
-      )}
-      
+    <section id="about" className="min-h-screen flex items-center py-24 px-6 relative overflow-hidden">
+      {/* Background Image with parallax */}
+      {bgImageUrl && <ParallaxBg imageUrl={bgImageUrl} opacity={0.45} />}
+
       {/* Content */}
       <div className="max-w-4xl mx-auto relative z-10">
         {content.title && (
-          <h2 className="text-5xl md:text-6xl mb-12 tracking-tight">{content.title}</h2>
+          <Reveal y={60}>
+            <h2 className="text-5xl md:text-6xl mb-12 tracking-tight">{content.title}</h2>
+          </Reveal>
         )}
-        
+
         {content.content && (
-          <div className="space-y-6 text-lg text-white/70 leading-relaxed">
+          <Reveal stagger={0.12} y={40} className="space-y-6 text-lg text-white/70 leading-relaxed">
             {content.content.split('\n\n').filter((paragraph) => paragraph.trim()).map((paragraph, index) => (
               <p key={index}>{paragraph}</p>
             ))}
-          </div>
+          </Reveal>
         )}
       </div>
     </section>

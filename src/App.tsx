@@ -7,6 +7,8 @@ import { MusicProduction } from './components/MusicProduction';
 import { Shows } from './components/Shows';
 import { Feed } from './components/Feed';
 import { Contact } from './components/Contact';
+import { MotionProvider } from './motion/MotionProvider';
+import { Marquee } from './motion/Marquee';
 
 const GalleryPage = lazy(() => (
   import('./components/GalleryPage').then((module) => ({ default: module.GalleryPage }))
@@ -115,15 +117,26 @@ export default function App() {
   }
 
   return (
-    <div className="bg-black text-white min-h-screen">
-      <Navigation activeSection={activeSection} />
-      <Hero />
-      <About />
-      <MusicProduction />
-      <Feed />
-      <Shows />
-      <CaptainsOfRevelry />
-      <Contact />
-    </div>
+    <MotionProvider>
+      <div className="bg-black text-white min-h-screen">
+        <Navigation activeSection={activeSection} />
+        <Hero />
+        <Marquee items={['Deep House', 'Tech House', 'Vocal House', 'Feelgood', 'High Energy', 'Soulful']} />
+        <About />
+        <MusicProduction />
+        <Marquee
+          items={['Decatur Bass', 'Bounce', 'Hot Mess', 'Hurt', 'Afterglow', 'Fade', 'Dropping Bombs']}
+          duration={34}
+        />
+        <Feed />
+        <Shows />
+        <CaptainsOfRevelry />
+        <Marquee
+          items={['Atlanta', 'Portland', 'Las Vegas', 'San Diego', 'Denver', 'Nashville', 'Philadelphia', 'Tampa', 'Memphis', 'Asheville']}
+          duration={40}
+        />
+        <Contact />
+      </div>
+    </MotionProvider>
   );
 }

@@ -4,6 +4,8 @@ import { ArrowUpRight, FileText, Instagram, Mail, Music2, Facebook, Video } from
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { normalizeCmsImages } from '../utils/cmsImages';
 import { EPK_PDF_URL, PUBLIC_BOOKING_EMAIL, pressLinks } from './pressKitContent';
+import { Reveal } from '../motion/Reveal';
+import { ParallaxBg } from '../motion/Parallax';
 
 function normalizeContactContent<T extends { title?: string }>(raw: T): T {
   return {
@@ -78,23 +80,17 @@ export function Contact() {
 
   return (
     <section id="contact" className="min-h-screen flex items-center py-24 px-6 relative overflow-hidden">
-      {/* Background Image */}
-      {bgImageUrl && (
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${bgImageUrl})`,
-            opacity: 0.81
-          }}
-        />
-      )}
+      {/* Background Image with parallax */}
+      {bgImageUrl && <ParallaxBg imageUrl={bgImageUrl} opacity={0.81} strength={0.15} />}
       <div className="absolute inset-0 bg-gradient-to-b from-neutral-950 to-black opacity-80" />
-      
+
       <div className="max-w-4xl mx-auto w-full relative z-10">
-        <h2 className="text-5xl md:text-6xl mb-16 tracking-tight">{content.title}</h2>
-        
-        <div className="space-y-12">
-          <div className="border border-white/10 p-8 bg-white/5 backdrop-blur-sm">
+        <Reveal y={60}>
+          <h2 className="text-5xl md:text-6xl mb-16 tracking-tight">{content.title}</h2>
+        </Reveal>
+
+        <Reveal stagger={0.15} y={60} className="space-y-12">
+          <div className="hover-lift border border-white/10 p-8 bg-white/5 backdrop-blur-sm">
             <div className="flex items-center gap-4 mb-4">
               <Mail className="w-6 h-6 text-white/70" />
               <h3 className="text-2xl">Email / Booking</h3>
@@ -110,7 +106,7 @@ export function Contact() {
             </p>
           </div>
 
-          <div className="border border-white/10 p-8 bg-white/5 backdrop-blur-sm">
+          <div className="hover-lift border border-white/10 p-8 bg-white/5 backdrop-blur-sm">
             <div className="flex items-center gap-4 mb-4">
               <FileText className="w-6 h-6 text-white/70" />
               <h3 className="text-2xl">Press / EPK</h3>
@@ -151,7 +147,7 @@ export function Contact() {
             </div>
           </div>
 
-          <div className="border border-white/10 p-8 bg-white/5 backdrop-blur-sm">
+          <div className="hover-lift border border-white/10 p-8 bg-white/5 backdrop-blur-sm">
             <h3 className="text-2xl mb-6">Connect / Socials</h3>
             <div className="space-y-4">
               {socialLinks.map((link, index) => {
@@ -174,7 +170,7 @@ export function Contact() {
               })}
             </div>
           </div>
-        </div>
+        </Reveal>
 
         <div className="mt-20 text-center text-white/30 text-sm">
           <p>&copy; 2025 Matt Silliman. All rights reserved.</p>

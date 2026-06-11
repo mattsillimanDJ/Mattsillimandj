@@ -1,0 +1,150 @@
+/* ============================================
+   Motion & typography layer — Matt Silliman DJ
+   ============================================ */
+
+/* ---------- Typography ---------- */
+body {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4,
+.font-display {
+  font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+h1 {
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+/* ---------- Split text (hero letter animation) ---------- */
+.split-line {
+  display: block;
+  overflow: hidden;
+}
+
+.split-char {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+.split-char.is-space {
+  width: 0.3em;
+}
+
+/* ---------- Reveal defaults (pre-animation state set by GSAP) ---------- */
+.gsap-reveal {
+  will-change: transform, opacity;
+}
+
+/* ---------- Marquee ---------- */
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  user-select: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.1rem 0;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.marquee__track {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5rem;
+  padding-right: 2.5rem;
+  will-change: transform;
+  animation: marquee-scroll var(--marquee-duration, 28s) linear infinite;
+}
+
+.marquee__item {
+  font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(0.85rem, 1.4vw, 1.05rem);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.marquee__item::after {
+  content: '✦';
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 0.7em;
+  letter-spacing: 0;
+}
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ---------- Magnetic elements ---------- */
+.magnetic {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* ---------- Card hover physics ---------- */
+.hover-lift {
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.45s ease,
+    background-color 0.45s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.9);
+}
+
+/* Springy hover for image tiles (Instagram grid, gallery) */
+.hover-spring {
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hover-spring:hover {
+  transform: scale(1.04);
+}
+
+/* ---------- Parallax containers ---------- */
+.parallax-bg {
+  position: absolute;
+  inset: -18% 0;
+  background-size: cover;
+  background-position: center;
+  will-change: transform;
+}
+
+/* ---------- Hero ---------- */
+.hero-zoom {
+  will-change: transform;
+}
+
+/* ---------- Nav hide/show ---------- */
+.nav-anim {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-anim.nav-hidden {
+  transform: translateY(-100%);
+}
+
+/* ---------- Reduced motion: kill everything ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .marquee__track {
+    animation: none;
+  }
+  .hover-lift,
+  .hover-spring,
+  .magnetic {
+    transition: none;
+  }
+}

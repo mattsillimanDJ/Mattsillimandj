@@ -8,6 +8,23 @@ interface NavigationProps {
 
 export function Navigation({ activeSection }: NavigationProps) {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [hidden, setHidden] = useState(false);
+
+  // Hide nav scrolling down, reveal scrolling up
+  useEffect(() => {
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (y > lastY && y > 200) {
+        setHidden(true);
+      } else if (y < lastY - 2) {
+        setHidden(false);
+      }
+      lastY = y;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     // Fetch logo from backend
@@ -59,7 +76,7 @@ export function Navigation({ activeSection }: NavigationProps) {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
+    <nav className={`nav-anim fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10 ${hidden ? 'nav-hidden' : ''}`}>
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <button

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Music, Radio } from 'lucide-react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { Reveal } from '../motion/Reveal';
 
 type MusicCategory = 'originals' | 'live' | 'deep';
 type PublicMusicCategory = Exclude<MusicCategory, 'deep'>;
@@ -95,7 +96,7 @@ function CmsMusicItem({ item }: { item: MusicItem }) {
   }, [soundCloudUrl]);
 
   return (
-    <div className="border border-white/10 p-6 bg-white/5 hover:bg-white/10 transition-all">
+    <div className="hover-lift border border-white/10 p-6 bg-white/5 hover:bg-white/10">
       <h3 className="text-xl mb-3">{title}</h3>
       {item.description && (
         <p className="text-white/60 leading-relaxed mb-5">{item.description}</p>
@@ -210,19 +211,23 @@ export function MusicProduction() {
   return (
     <section id="music-production" className="min-h-screen py-24 px-6 bg-gradient-to-b from-black to-neutral-950">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-5xl md:text-6xl mb-6 tracking-tight">Music</h2>
-        <p className="max-w-3xl mb-16 text-lg text-white/60 leading-relaxed">
-          Curated originals and sets that move between deep, soulful warmth and high-energy house.
-        </p>
-        
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
+        <Reveal y={60}>
+          <h2 className="text-5xl md:text-6xl mb-6 tracking-tight">Music</h2>
+        </Reveal>
+        <Reveal y={40} delay={0.1}>
+          <p className="max-w-3xl mb-16 text-lg text-white/60 leading-relaxed">
+            Curated originals and sets that move between deep, soulful warmth and high-energy house.
+          </p>
+        </Reveal>
+
+        <Reveal stagger={0.15} y={60} scale className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
           {productions.map((item, index) => {
             const Icon = item.icon;
             const isActive = cmsEmbeds.length > 0 && selectedCategory === item.category;
             return (
               <div
                 key={index}
-                className={`border p-8 min-h-[260px] h-full flex flex-col hover:bg-white/10 transition-all ${
+                className={`hover-lift border p-8 min-h-[260px] h-full flex flex-col hover:bg-white/10 ${
                   isActive ? 'border-white/40 bg-white/10' : 'border-white/10 bg-white/5'
                 } ${
                   item.scrollTo || cmsEmbeds.length > 0 ? 'cursor-pointer' : ''
@@ -241,50 +246,56 @@ export function MusicProduction() {
               </div>
             );
           })}
-        </div>
+        </Reveal>
 
         {cmsEmbeds.length > 0 ? (
-          <div id="recent-releases" className="max-w-3xl mx-auto space-y-6">
-            {filteredCmsEmbeds.length > 0 ? (
-              filteredCmsEmbeds.map((item) => (
-                <CmsMusicItem key={item.id} item={item} />
-              ))
-            ) : (
-              <p className="text-white/60">No tracks in this category yet.</p>
-            )}
-          </div>
+          <Reveal stagger={0.1} y={40} as="div" className="max-w-3xl mx-auto space-y-6" style={undefined}>
+            <div id="recent-releases" className="space-y-6">
+              {filteredCmsEmbeds.length > 0 ? (
+                filteredCmsEmbeds.map((item) => (
+                  <CmsMusicItem key={item.id} item={item} />
+                ))
+              ) : (
+                <p className="text-white/60">No tracks in this category yet.</p>
+              )}
+            </div>
+          </Reveal>
         ) : (
           <>
         <div id="recent-releases" className="max-w-3xl mx-auto mb-24">
-          <h3 className="text-3xl mb-4">Originals</h3>
-          <p className="mb-10 text-white/60">Original productions selected for feel, groove, and room energy.</p>
-          <div className="space-y-6">
+          <Reveal y={50}>
+            <h3 className="text-3xl mb-4">Originals</h3>
+            <p className="mb-10 text-white/60">Original productions selected for feel, groove, and room energy.</p>
+          </Reveal>
+          <Reveal stagger={0.12} y={50} className="space-y-6">
             {releases.map((release, index) => (
               <div
                 key={index}
-                className="border border-white/10 p-6 bg-white/5 hover:bg-white/10 transition-all"
+                className="hover-lift border border-white/10 p-6 bg-white/5 hover:bg-white/10"
               >
                 <h4 className="text-xl mb-4">{release.title}</h4>
                 <div dangerouslySetInnerHTML={{ __html: release.embedCode }} />
               </div>
             ))}
-          </div>
+          </Reveal>
         </div>
 
         <div id="live-mixes-sets" className="max-w-3xl mx-auto">
-          <h3 className="text-3xl mb-4">Live Mixes</h3>
-          <p className="mb-10 text-white/60">Peak-time and feelgood sets recorded from rooms already in motion.</p>
-          <div className="space-y-6">
+          <Reveal y={50}>
+            <h3 className="text-3xl mb-4">Live Mixes</h3>
+            <p className="mb-10 text-white/60">Peak-time and feelgood sets recorded from rooms already in motion.</p>
+          </Reveal>
+          <Reveal stagger={0.12} y={50} className="space-y-6">
             {liveMixes.map((liveMix, index) => (
               <div
                 key={index}
-                className="border border-white/10 p-6 bg-white/5 hover:bg-white/10 transition-all"
+                className="hover-lift border border-white/10 p-6 bg-white/5 hover:bg-white/10"
               >
                 <h4 className="text-xl mb-4">{liveMix.title}</h4>
                 <div dangerouslySetInnerHTML={{ __html: liveMix.embedCode }} />
               </div>
             ))}
-          </div>
+          </Reveal>
         </div>
           </>
         )}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ExternalLink, Instagram } from 'lucide-react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { Reveal } from '../motion/Reveal';
 
 interface FeedItem {
   id: string;
@@ -76,10 +77,10 @@ export function Feed() {
   return (
     <section id="feed" className="bg-black px-6" style={{ paddingTop: '5rem', paddingBottom: '1.5rem' }}>
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-center gap-4 mb-5">
+        <Reveal y={50} className="flex items-center justify-center gap-4 mb-5">
           <Instagram className="w-8 h-8 text-white/60" />
           <h2 className="text-5xl tracking-tight">FEED</h2>
-        </div>
+        </Reveal>
 
         <div className="text-center mb-6">
           <a
@@ -122,9 +123,9 @@ export function Feed() {
         )}
 
         {!loading && !error && hasEmbed && (
-          <div className="mx-auto max-w-6xl">
+          <Reveal y={60} className="mx-auto max-w-6xl">
             <FeedEmbed embedCode={embedCode} />
-          </div>
+          </Reveal>
         )}
 
         {!loading && !error && !hasEmbed && visibleItems.length === 0 && (
@@ -150,7 +151,7 @@ export function Feed() {
         )}
 
         {!loading && !error && !hasEmbed && visibleItems.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Reveal stagger={0.08} y={50} scale className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {visibleItems.map((item) => {
               const tileContent = (
                 <>
@@ -192,7 +193,7 @@ export function Feed() {
                 </div>
               );
             })}
-          </div>
+          </Reveal>
         )}
       </div>
     </section>
