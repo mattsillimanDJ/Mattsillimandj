@@ -2,11 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.mattsillimandj.com/</loc>
+    <lastmod>2026-07-22</lastmod>
+  </url>
+  <url>
+    <loc>https://www.mattsillimandj.com/feelgood-house</loc>
+    <lastmod>2026-07-22</lastmod>
+  </url>
+  <url>
+    <loc>https://www.mattsillimandj.com/shows</loc>
+    <lastmod>2026-07-22</lastmod>
   </url>
   <url>
     <loc>https://www.mattsillimandj.com/gallery</loc>
+    <lastmod>2026-07-22</lastmod>
   </url>
   <url>
     <loc>https://www.mattsillimandj.com/press</loc>
+    <lastmod>2026-07-22</lastmod>
   </url>
 </urlset>
