@@ -65,7 +65,12 @@ export function Navigation({ activeSection }: NavigationProps) {
     window.location.href = '/gallery';
   };
 
+  const goToFeelgoodHouse = () => {
+    window.location.href = '/feelgood-house';
+  };
+
   const navItems = [
+    { id: 'feelgood-house', label: 'Feelgood House', page: 'feelgood' },
     { id: 'about', label: 'About' },
     { id: 'music-production', label: 'Production and Mixes' },
     { id: 'feed', label: 'Feed' },
@@ -90,7 +95,7 @@ export function Navigation({ activeSection }: NavigationProps) {
             {navItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => item.page === 'gallery' ? goToGallery() : scrollToSection(item.id)}
+                onClick={() => item.page === 'gallery' ? goToGallery() : item.page === 'feelgood' ? goToFeelgoodHouse() : scrollToSection(item.id)}
                 className={`uppercase text-sm tracking-wider transition-colors ${
                   activeSection === item.id
                     ? 'text-white'
