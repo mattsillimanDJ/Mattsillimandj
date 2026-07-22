@@ -23,10 +23,13 @@ const ShowsPage = lazy(() => (
 const CMS = lazy(() => (
   import('./components/CMS').then((module) => ({ default: module.CMS }))
 ));
+const FeelgoodHouse = lazy(() => (
+  import('./components/FeelgoodHouse').then((module) => ({ default: module.FeelgoodHouse }))
+));
 
 export default function App() {
   const [activeSection, setActiveSection] = useState('hero');
-  const [currentPage, setCurrentPage] = useState<'home' | 'gallery' | 'press' | 'shows' | 'cms'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'gallery' | 'press' | 'shows' | 'cms' | 'feelgood'>('home');
 
   useEffect(() => {
     const setPageFromPath = () => {
@@ -42,6 +45,9 @@ export default function App() {
       } else if (path === '/shows') {
         setCurrentPage('shows');
         setActiveSection('shows');
+      } else if (path === '/feelgood-house') {
+        setCurrentPage('feelgood');
+        setActiveSection('feelgood-house');
       } else {
         setCurrentPage('home');
       }
@@ -52,6 +58,44 @@ export default function App() {
     window.addEventListener('popstate', setPageFromPath);
     return () => window.removeEventListener('popstate', setPageFromPath);
   }, []);
+
+  useEffect(() => {
+    const seo: Record<string, { title: string; description: string }> = {
+      home: {
+        title: 'Matt Silliman | Feelgood House Music DJ & Producer',
+        description:
+          'Feelgood house music DJ and producer Matt Silliman brings deep, soulful, high-energy house music to clubs, rooftops, private events, venues, and brand activations.',
+      },
+      feelgood: {
+        title: 'Feelgood House | Come for the Music. Stay for the People.',
+        description:
+          'Feelgood House is a community built around extraordinary house music, great people, kindness, connection, and dance. Come for the music. Stay for the people. Leave happier than when you arrived.',
+      },
+      gallery: {
+        title: 'Photo Gallery | Matt Silliman',
+        description: 'Photos from Matt Silliman DJ sets, events, and the Feelgood House community.',
+      },
+      press: {
+        title: 'Press Kit & EPK | Matt Silliman',
+        description: 'Artist bio, selected press, visuals, music links, and booking contact for house music DJ and producer Matt Silliman.',
+      },
+      shows: {
+        title: 'Upcoming Shows | Matt Silliman',
+        description: 'Upcoming Matt Silliman DJ sets and Feelgood House events in Atlanta and beyond.',
+      },
+    };
+    const entry = seo[currentPage];
+    if (entry) {
+      document.title = entry.title;
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) metaDescription.setAttribute('content', entry.description);
+      const canonical = document.querySelector('link[rel="canonical"]');
+      if (canonical) {
+        const paths: Record<string, string> = { home: '/', feelgood: '/feelgood-house', gallery: '/gallery', press: '/press', shows: '/shows' };
+        canonical.setAttribute('href', `https://www.mattsillimandj.com${paths[currentPage] === '/' ? '/' : paths[currentPage]}`);
+      }
+    }
+  }, [currentPage]);
 
   useEffect(() => {
     if (currentPage !== 'home') return;
@@ -101,6 +145,17 @@ export default function App() {
         <Navigation activeSection="press-kit" />
         <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center">Loading press kit...</div>}>
           <PressKit isPage />
+        </Suspense>
+      </div>
+    );
+  }
+
+  if (currentPage === 'feelgood') {
+    return (
+      <div className="bg-black text-white min-h-screen">
+        <Navigation activeSection="feelgood-house" />
+        <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center">Loading...</div>}>
+          <FeelgoodHouse />
         </Suspense>
       </div>
     );
