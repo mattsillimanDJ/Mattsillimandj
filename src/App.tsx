@@ -7,6 +7,7 @@ import { MusicProduction } from './components/MusicProduction';
 import { Shows } from './components/Shows';
 import { Feed } from './components/Feed';
 import { Contact } from './components/Contact';
+import { Newsletter } from './components/Newsletter';
 import { MotionProvider } from './motion/MotionProvider';
 import { Marquee } from './motion/Marquee';
 
@@ -135,6 +136,7 @@ export default function App() {
           items={['Atlanta', 'Portland', 'Las Vegas', 'San Diego', 'Denver', 'Nashville', 'Philadelphia', 'Tampa', 'Memphis', 'Asheville']}
           duration={40}
         />
+        <Newsletter />
         <Contact />
       </div>
     </MotionProvider>
