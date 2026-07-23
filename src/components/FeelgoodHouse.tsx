@@ -27,12 +27,11 @@ export function FeelgoodHouse() {
         <img
           src="/trust%20the%20dj.png"
           alt="Feelgood House Music — Trust the DJ — Matt Silliman"
-          className="relative w-full max-w-sm"
+          className="relative w-full"
+          style={{ maxWidth: 360 }}
         />
-        <h1 className="relative mt-12 text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
-          Come for the music.
-          <br />
-          Stay for the people.
+        <h1 className="relative mt-10 text-2xl md:text-4xl font-semibold tracking-tight leading-[1.15]">
+          Come for the music. Stay for the people.
           <br />
           <span style={{ color: GOLD }}>Leave happier than when you arrived.</span>
         </h1>
