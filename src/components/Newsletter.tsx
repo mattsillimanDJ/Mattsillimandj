@@ -55,7 +55,7 @@ export function Newsletter() {
             knowing. No noise — only what’s worth hearing.
           </p>
 
-          <form onSubmit={handleSubmit} className="flex max-w-xl flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4" style={{ maxWidth: 560 }}>
             <label htmlFor="newsletter-first-name" className="sr-only">First name</label>
             <input
               id="newsletter-first-name"
@@ -63,7 +63,7 @@ export function Newsletter() {
               value={firstName}
               onChange={(event) => setFirstName(event.target.value)}
               placeholder="first name"
-              className="min-h-14 border border-white/25 bg-white/5 px-4 text-white placeholder:text-white/40 outline-none transition-colors focus:border-[#F5A623]"
+              className="min-h-14 px-4 text-white outline-none" style={{ border: '1px solid rgba(255,255,255,0.28)', background: 'rgba(255,255,255,0.05)' }}
               disabled={status === 'submitting'}
             />
             <label htmlFor="newsletter-email" className="sr-only">Email</label>
@@ -74,13 +74,13 @@ export function Newsletter() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="email"
-              className="min-h-14 flex-1 border border-white/25 bg-white/5 px-4 text-white placeholder:text-white/40 outline-none transition-colors focus:border-[#F5A623]"
+              className="min-h-14 px-4 text-white outline-none" style={{ border: '1px solid rgba(255,255,255,0.28)', background: 'rgba(255,255,255,0.05)' }}
               disabled={status === 'submitting'}
             />
             <button
               type="submit"
               disabled={status === 'submitting'}
-              className="min-h-14 bg-[#F5A623] px-8 font-medium text-black transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+              className="min-h-14 px-8 font-medium text-black transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60" style={{ backgroundColor: '#F5A623' }}
             >
               {status === 'submitting' ? 'One sec…' : 'Count me in'}
             </button>
