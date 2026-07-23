@@ -2,9 +2,13 @@ import { FormEvent, useState } from 'react';
 
 const KIT_FORM_URL = 'https://app.kit.com/forms/9715279/subscriptions';
 
+const inputStyle = { border: '1px solid rgba(255,255,255,0.28)', background: 'rgba(255,255,255,0.05)' };
+
 export function Newsletter() {
-  const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
@@ -16,9 +20,9 @@ export function Newsletter() {
     try {
       const body = new FormData();
       body.append('email_address', email);
-      if (firstName) {
-        body.append('fields[first_name]', firstName);
-      }
+      if (firstName) body.append('fields[first_name]', firstName);
+      if (lastName) body.append('fields[last_name]', lastName);
+      if (phone) body.append('fields[phone_number]', phone);
 
       const response = await fetch(KIT_FORM_URL, {
         method: 'POST',
@@ -36,8 +40,10 @@ export function Newsletter() {
 
       setStatus('success');
       setMessage('Almost in — check your inbox and confirm your email.');
-      setEmail('');
       setFirstName('');
+      setLastName('');
+      setEmail('');
+      setPhone('');
     } catch (err) {
       console.error('Newsletter signup failed:', err);
       setStatus('error');
@@ -63,7 +69,19 @@ export function Newsletter() {
               value={firstName}
               onChange={(event) => setFirstName(event.target.value)}
               placeholder="first name"
-              className="min-h-14 px-4 text-white outline-none" style={{ border: '1px solid rgba(255,255,255,0.28)', background: 'rgba(255,255,255,0.05)' }}
+              className="min-h-14 px-4 text-white outline-none"
+              style={inputStyle}
+              disabled={status === 'submitting'}
+            />
+            <label htmlFor="newsletter-last-name" className="sr-only">Last name</label>
+            <input
+              id="newsletter-last-name"
+              type="text"
+              value={lastName}
+              onChange={(event) => setLastName(event.target.value)}
+              placeholder="last name"
+              className="min-h-14 px-4 text-white outline-none"
+              style={inputStyle}
               disabled={status === 'submitting'}
             />
             <label htmlFor="newsletter-email" className="sr-only">Email</label>
@@ -74,13 +92,30 @@ export function Newsletter() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="email"
-              className="min-h-14 px-4 text-white outline-none" style={{ border: '1px solid rgba(255,255,255,0.28)', background: 'rgba(255,255,255,0.05)' }}
+              className="min-h-14 px-4 text-white outline-none"
+              style={inputStyle}
               disabled={status === 'submitting'}
             />
+            <label htmlFor="newsletter-phone" className="sr-only">Cell number</label>
+            <input
+              id="newsletter-phone"
+              type="tel"
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+              placeholder="cell number (optional)"
+              className="min-h-14 px-4 text-white outline-none"
+              style={inputStyle}
+              disabled={status === 'submitting'}
+            />
+            <p className="text-xs text-white/40">
+              By adding your number you agree to receive occasional texts about events and releases. Message and data
+              rates may apply. Reply STOP to opt out anytime.
+            </p>
             <button
               type="submit"
               disabled={status === 'submitting'}
-              className="min-h-14 px-8 font-medium text-black transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60" style={{ backgroundColor: '#F5A623' }}
+              className="min-h-14 px-8 font-medium text-black transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+              style={{ backgroundColor: '#F5A623' }}
             >
               {status === 'submitting' ? 'One sec…' : 'Count me in'}
             </button>
