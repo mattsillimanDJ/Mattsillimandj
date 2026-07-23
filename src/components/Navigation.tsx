@@ -69,6 +69,15 @@ export function Navigation({ activeSection }: NavigationProps) {
     window.location.href = '/feelgood-house';
   };
 
+  const goToSignup = () => {
+    const el = document.getElementById('newsletter');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.location.href = '/feelgood-house';
+    }
+  };
+
   const navItems = [
     { id: 'about', label: 'About' },
     { id: 'music-production', label: 'Production and Mixes' },
@@ -105,6 +114,13 @@ export function Navigation({ activeSection }: NavigationProps) {
                 {item.label}
               </button>
             ))}
+            <button
+              onClick={goToSignup}
+              className="uppercase text-sm tracking-wider text-black px-4 py-2 transition-transform hover:scale-[1.03]"
+              style={{ backgroundColor: '#F5A623' }}
+            >
+              Stay Connected
+            </button>
           </div>
         </div>
       </div>
