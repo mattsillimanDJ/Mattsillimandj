@@ -1,39 +1,55 @@
 import { Newsletter } from './Newsletter';
 
-function scrollToNewsletter() {
-  document.getElementById('newsletter')?.scrollIntoView({ behavior: 'smooth' });
+const GOLD = '#F5A623';
+
+function scrollTo(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 }
 
-function scrollToPhilosophy() {
-  document.getElementById('philosophy')?.scrollIntoView({ behavior: 'smooth' });
+function Sparkle({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 100 100" className={className} fill={GOLD} aria-hidden="true">
+      <path d="M50 6 C54 38 62 46 94 50 C62 54 54 62 50 94 C46 62 38 54 6 50 C38 46 46 38 50 6 Z" />
+    </svg>
+  );
 }
 
 export function FeelgoodHouse() {
   return (
-    <main className="pt-40">
-      {/* Hero */}
-      <section className="px-6 pb-24">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-5xl md:text-7xl tracking-tight leading-[1.05] max-w-4xl">
+    <main className="bg-black text-white">
+      {/* HERO */}
+      <section className="relative flex min-h-screen items-center overflow-hidden px-6 pt-40 pb-24">
+        {/* gold glow */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ background: `radial-gradient(60% 50% at 50% 35%, ${GOLD}22 0%, transparent 70%)` }}
+        />
+        <div className="relative mx-auto w-full max-w-6xl">
+          <Sparkle className="mb-8 h-12 w-12" />
+          <p className="uppercase tracking-[0.3em] text-sm" style={{ color: GOLD }}>
+            Feelgood House
+          </p>
+          <h1 className="mt-6 text-5xl md:text-7xl font-semibold tracking-tight leading-[1.02] max-w-4xl">
             Come for the music.
             <br />
             Stay for the people.
             <br />
-            <span className="text-white/60">Leave happier than when you arrived.</span>
+            <span style={{ color: GOLD }}>Leave happier than when you arrived.</span>
           </h1>
-          <p className="mt-8 max-w-2xl text-lg text-white/60">
+          <p className="mt-8 max-w-2xl text-lg text-white/70">
             A community built around extraordinary music, great people, kindness, connection, and dance.
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row">
             <button
-              onClick={scrollToNewsletter}
-              className="min-h-14 bg-white px-8 text-black transition-colors hover:bg-white/90"
+              onClick={() => scrollTo('newsletter')}
+              className="min-h-14 px-8 font-medium text-black transition-transform hover:scale-[1.02]"
+              style={{ backgroundColor: GOLD }}
             >
               Join the community
             </button>
             <button
-              onClick={scrollToPhilosophy}
-              className="min-h-14 border border-white/20 px-8 text-white transition-colors hover:border-white/50"
+              onClick={() => scrollTo('philosophy')}
+              className="min-h-14 border border-white/25 px-8 text-white transition-colors hover:border-white/60"
             >
               Read our philosophy
             </button>
@@ -41,61 +57,68 @@ export function FeelgoodHouse() {
         </div>
       </section>
 
-      {/* Belief */}
-      <section id="philosophy" className="px-6 py-24 bg-neutral-950">
-        <div className="max-w-6xl mx-auto">
-          <p className="uppercase text-sm tracking-wider text-white/40 mb-6">What we believe</p>
-          <h2 className="text-4xl md:text-5xl tracking-tight leading-tight max-w-3xl">
+      {/* BELIEF */}
+      <section id="philosophy" className="border-t border-white/10 px-6 py-28">
+        <div className="mx-auto max-w-6xl">
+          <p className="mb-6 text-sm uppercase tracking-[0.3em]" style={{ color: GOLD }}>
+            What we believe
+          </p>
+          <h2 className="max-w-3xl text-4xl md:text-5xl font-semibold tracking-tight leading-tight">
             We believe great music changes people.
           </h2>
-          <div className="mt-8 max-w-2xl space-y-4 text-lg text-white/60">
+          <div className="mt-8 max-w-2xl space-y-4 text-lg text-white/70">
             <p>It breaks down barriers. It creates connection. It reminds us how good it feels to be together.</p>
             <p>
-              Feelgood House isn’t a genre rule. Deep house, tech house, disco, Afro house, melodic — the label is
-              secondary to the effect. The music should make you move, close your eyes, raise your hands, and find
-              something you didn’t know you were looking for.
+              Feelgood House isn&rsquo;t a genre rule. Deep house, tech house, disco, Afro house, melodic &mdash; the
+              label is secondary to the effect. The music should make you move, close your eyes, raise your hands, and
+              find something you didn&rsquo;t know you were looking for.
             </p>
           </div>
         </div>
       </section>
 
-      {/* The standard */}
-      <section className="px-6 py-24">
-        <div className="max-w-6xl mx-auto">
-          <p className="uppercase text-sm tracking-wider text-white/40 mb-6">The standard</p>
-          <div className="max-w-3xl space-y-3 text-2xl md:text-3xl tracking-tight">
+      {/* THE STANDARD */}
+      <section className="border-t border-white/10 px-6 py-28">
+        <div className="mx-auto max-w-6xl">
+          <p className="mb-6 text-sm uppercase tracking-[0.3em]" style={{ color: GOLD }}>
+            The standard &mdash; trust the DJ
+          </p>
+          <div className="max-w-3xl space-y-3 text-2xl md:text-3xl font-medium tracking-tight">
             <p>Protect the music.</p>
             <p>Serve the room.</p>
             <p>Support fellow artists.</p>
             <p>Treat every person with respect.</p>
-            <p className="text-white/60">This is bigger than any one of us.</p>
+            <p className="text-white/50">This is bigger than any one of us.</p>
           </div>
-          <p className="mt-8 max-w-2xl text-lg text-white/60">
-            The booth doesn’t make a DJ more important than the people on the floor. Confidence, style, and talent
-            are welcome here. Ego isn’t.
+          <p className="mt-8 max-w-2xl text-lg text-white/70">
+            The booth doesn&rsquo;t make a DJ more important than the people on the floor. Confidence, style, and talent
+            are welcome here. Ego isn&rsquo;t.
           </p>
         </div>
       </section>
 
-      {/* An Open Door */}
-      <section className="px-6 py-24 bg-neutral-950">
-        <div className="max-w-6xl mx-auto">
-          <p className="uppercase text-sm tracking-wider text-white/40 mb-6">An open door</p>
+      {/* OPEN DOOR */}
+      <section className="border-t border-white/10 px-6 py-28">
+        <div className="mx-auto max-w-6xl">
+          <p className="mb-6 text-sm uppercase tracking-[0.3em]" style={{ color: GOLD }}>
+            An open door
+          </p>
           <div className="max-w-3xl space-y-4 text-lg text-white/70">
-            <p>We’re not here to convince you. We’re here to open the door.</p>
+            <p>We&rsquo;re not here to convince you. We&rsquo;re here to open the door.</p>
             <p>
-              If great music matters to you… if kindness matters to you… if community matters to you… come dance
-              with us.
+              If great music matters to you&hellip; if kindness matters to you&hellip; if community matters to you&hellip;
+              come dance with us.
             </p>
-            <p>If you find what we found, you’re welcome to stay. If not, you’re always welcome back.</p>
-            <p className="text-white">
-              We’ll be here. Dancing.
-            </p>
+            <p>If you find what we found, you&rsquo;re welcome to stay. If not, you&rsquo;re always welcome back.</p>
+            <p className="text-white">We&rsquo;ll be here. Dancing.</p>
           </div>
+          <Sparkle className="mt-12 h-10 w-10" />
         </div>
       </section>
 
-      <Newsletter />
+      <div className="border-t border-white/10">
+        <Newsletter />
+      </div>
     </main>
   );
 }
