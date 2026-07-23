@@ -55,7 +55,7 @@ export function Newsletter() {
             knowing. No noise — only what’s worth hearing.
           </p>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:flex-row">
+          <form onSubmit={handleSubmit} className="flex max-w-xl flex-col gap-4">
             <label htmlFor="newsletter-first-name" className="sr-only">First name</label>
             <input
               id="newsletter-first-name"
@@ -63,7 +63,7 @@ export function Newsletter() {
               value={firstName}
               onChange={(event) => setFirstName(event.target.value)}
               placeholder="first name"
-              className="min-h-14 border border-white/25 bg-white/5 px-4 text-white placeholder:text-white/40 outline-none transition-colors focus:border-[#F5A623] sm:w-44"
+              className="min-h-14 border border-white/25 bg-white/5 px-4 text-white placeholder:text-white/40 outline-none transition-colors focus:border-[#F5A623]"
               disabled={status === 'submitting'}
             />
             <label htmlFor="newsletter-email" className="sr-only">Email</label>

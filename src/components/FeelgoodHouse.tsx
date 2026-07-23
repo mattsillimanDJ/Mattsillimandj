@@ -39,17 +39,17 @@ export function FeelgoodHouse() {
           <p className="mt-8 max-w-2xl text-lg text-white/70">
             A community built around extraordinary music, great people, kindness, connection, and dance.
           </p>
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+          <div className="mt-10 flex flex-wrap gap-4">
             <button
               onClick={() => scrollTo('newsletter')}
-              className="min-h-14 px-8 font-medium text-black transition-transform hover:scale-[1.02]"
+              className="min-h-14 w-fit px-8 font-medium text-black transition-transform hover:scale-[1.02]"
               style={{ backgroundColor: GOLD }}
             >
               Join the community
             </button>
             <button
               onClick={() => scrollTo('philosophy')}
-              className="min-h-14 border border-white/25 px-8 text-white transition-colors hover:border-white/60"
+              className="min-h-14 w-fit border border-white/25 px-8 text-white transition-colors hover:border-white/60"
             >
               Read our philosophy
             </button>
