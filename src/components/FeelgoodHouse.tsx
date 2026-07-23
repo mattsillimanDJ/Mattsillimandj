@@ -18,42 +18,41 @@ export function FeelgoodHouse() {
   return (
     <main className="bg-black text-white">
       {/* HERO */}
-      <section className="relative flex min-h-screen items-center overflow-hidden px-6 pt-40 pb-24">
+      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 pt-36 pb-24 text-center">
         {/* gold glow */}
         <div
           className="pointer-events-none absolute inset-0"
-          style={{ background: `radial-gradient(60% 50% at 50% 35%, ${GOLD}22 0%, transparent 70%)` }}
+          style={{ background: `radial-gradient(55% 45% at 50% 40%, ${GOLD}22 0%, transparent 70%)` }}
         />
-        <div className="relative mx-auto w-full max-w-6xl">
-          <Sparkle className="mb-8 h-12 w-12" />
-          <p className="uppercase tracking-[0.3em] text-sm" style={{ color: GOLD }}>
-            Feelgood House
-          </p>
-          <h1 className="mt-6 text-5xl md:text-7xl font-semibold tracking-tight leading-[1.02] max-w-4xl">
-            Come for the music.
-            <br />
-            Stay for the people.
-            <br />
-            <span style={{ color: GOLD }}>Leave happier than when you arrived.</span>
-          </h1>
-          <p className="mt-8 max-w-2xl text-lg text-white/70">
-            A community built around extraordinary music, great people, kindness, connection, and dance.
-          </p>
-          <div className="mt-10 flex flex-wrap gap-4">
-            <button
-              onClick={() => scrollTo('newsletter')}
-              className="min-h-14 w-fit px-8 font-medium text-black transition-transform hover:scale-[1.02]"
-              style={{ backgroundColor: GOLD }}
-            >
-              Join the community
-            </button>
-            <button
-              onClick={() => scrollTo('philosophy')}
-              className="min-h-14 w-fit border border-white/25 px-8 text-white transition-colors hover:border-white/60"
-            >
-              Read our philosophy
-            </button>
-          </div>
+        <img
+          src="/trust%20the%20dj.png"
+          alt="Feelgood House Music — Trust the DJ — Matt Silliman"
+          className="relative w-full max-w-sm"
+        />
+        <h1 className="relative mt-12 text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
+          Come for the music.
+          <br />
+          Stay for the people.
+          <br />
+          <span style={{ color: GOLD }}>Leave happier than when you arrived.</span>
+        </h1>
+        <p className="relative mt-8 max-w-2xl text-lg text-white/70">
+          A community built around extraordinary music, great people, kindness, connection, and dance.
+        </p>
+        <div className="relative mt-10 flex flex-wrap justify-center gap-4">
+          <button
+            onClick={() => scrollTo('newsletter')}
+            className="min-h-14 w-fit px-8 font-medium text-black transition-transform hover:scale-[1.02]"
+            style={{ backgroundColor: GOLD }}
+          >
+            Join the community
+          </button>
+          <button
+            onClick={() => scrollTo('philosophy')}
+            className="min-h-14 w-fit border border-white/25 px-8 text-white transition-colors hover:border-white/60"
+          >
+            Read our philosophy
+          </button>
         </div>
       </section>
 
