@@ -9,6 +9,16 @@ interface NavigationProps {
 export function Navigation({ activeSection }: NavigationProps) {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [hidden, setHidden] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // Track viewport so we can swap to a mobile menu (many nav items don't fit on phones)
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 1080);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   // Hide nav scrolling down, reveal scrolling up
   useEffect(() => {
@@ -27,13 +37,10 @@ export function Navigation({ activeSection }: NavigationProps) {
   }, []);
 
   useEffect(() => {
-    // Fetch logo from backend
     const loadLogo = async () => {
       try {
         const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-80948ead/cms/images`, {
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
+          headers: { 'Authorization': `Bearer ${publicAnonKey}` },
         });
         const data = await response.json();
         const images = normalizeCmsImages(data.images);
@@ -44,7 +51,6 @@ export function Navigation({ activeSection }: NavigationProps) {
         console.error('Failed to load logo:', err);
       }
     };
-
     loadLogo();
   }, []);
 
@@ -54,21 +60,14 @@ export function Navigation({ activeSection }: NavigationProps) {
       window.location.href = `/#${sectionId}`;
       return;
     }
-
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
-  const goToGallery = () => {
-    window.location.href = '/gallery';
-  };
-
-  const goToFeelgoodHouse = () => {
-    window.location.href = '/feelgood-house';
-  };
-
+  const goToGallery = () => { window.location.href = '/gallery'; };
+  const goToFeelgoodHouse = () => { window.location.href = '/feelgood-house'; };
   const goToSignup = () => {
     const el = document.getElementById('newsletter');
     if (el) {
@@ -89,41 +88,90 @@ export function Navigation({ activeSection }: NavigationProps) {
     { id: 'captains-of-revelry', label: 'Captains' },
   ];
 
+  const handleNav = (item: { id: string; page?: string }) => {
+    setMenuOpen(false);
+    if (item.page === 'gallery') goToGallery();
+    else if (item.page === 'feelgood') goToFeelgoodHouse();
+    else scrollToSection(item.id);
+  };
+
   return (
     <nav className={`nav-anim fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10 ${hidden ? 'nav-hidden' : ''}`}>
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <button
-            onClick={() => scrollToSection('hero')}
+            onClick={() => { setMenuOpen(false); scrollToSection('hero'); }}
             className="hover:opacity-70 transition-opacity"
           >
-            {logoUrl && <img src={logoUrl} alt="Matt Silliman Logo" className="h-24" />}
+            {logoUrl && (
+              <img src={logoUrl} alt="Matt Silliman Logo" className={isMobile ? 'h-14' : 'h-24'} />
+            )}
           </button>
-          
-          <div className="flex gap-4 md:gap-8 flex-wrap justify-end">
+
+          {!isMobile && (
+            <div className="flex gap-8 justify-end items-center">
+              {navItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => handleNav(item)}
+                  className={`uppercase text-sm tracking-wider transition-colors ${
+                    activeSection === item.id ? 'text-white' : 'text-white/50 hover:text-white/80'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+              <button
+                onClick={goToSignup}
+                className="uppercase text-sm tracking-wider text-black px-4 py-2 transition-transform hover:scale-[1.03]"
+                style={{ backgroundColor: '#F5A623' }}
+              >
+                Stay Connected
+              </button>
+            </div>
+          )}
+
+          {isMobile && (
+            <button
+              aria-label="Menu"
+              onClick={() => setMenuOpen((o) => !o)}
+              className="flex flex-col justify-center gap-1.5 p-2"
+            >
+              <span className="block h-0.5 w-7 bg-white" />
+              <span className="block h-0.5 w-7 bg-white" />
+              <span className="block h-0.5 w-7 bg-white" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {isMobile && menuOpen && (
+        <div
+          className="border-t border-white/10 bg-black/95 px-6 py-6"
+          style={{ backdropFilter: 'blur(8px)' }}
+        >
+          <div className="flex flex-col gap-5">
             {navItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => item.page === 'gallery' ? goToGallery() : item.page === 'feelgood' ? goToFeelgoodHouse() : scrollToSection(item.id)}
-                className={`uppercase text-sm tracking-wider transition-colors ${
-                  activeSection === item.id
-                    ? 'text-white'
-                    : 'text-white/50 hover:text-white/80'
+                onClick={() => handleNav(item)}
+                className={`text-left uppercase text-base tracking-wider ${
+                  activeSection === item.id ? 'text-white' : 'text-white/60'
                 }`}
               >
                 {item.label}
               </button>
             ))}
             <button
-              onClick={goToSignup}
-              className="uppercase text-sm tracking-wider text-black px-4 py-2 transition-transform hover:scale-[1.03]"
+              onClick={() => { setMenuOpen(false); goToSignup(); }}
+              className="mt-2 w-full uppercase text-sm tracking-wider text-black py-3"
               style={{ backgroundColor: '#F5A623' }}
             >
               Stay Connected
             </button>
           </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 }

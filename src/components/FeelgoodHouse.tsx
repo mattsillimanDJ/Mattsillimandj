@@ -61,7 +61,7 @@ export function FeelgoodHouse() {
       </section>
 
       {/* BELIEF — over daytime crowd */}
-      <section id="philosophy" className="relative px-6 py-32" style={photoBg('/crowd-day.jpg', 0.7)}>
+      <section id="philosophy" className="relative px-6 py-24" style={photoBg('/crowd-day.jpg', 0.7)}>
         <div className="mx-auto max-w-6xl">
           <p className="mb-6 text-sm uppercase tracking-[0.3em]" style={{ color: GOLD }}>
             What we believe
@@ -69,7 +69,7 @@ export function FeelgoodHouse() {
           <h2 className="max-w-3xl text-4xl md:text-5xl font-semibold tracking-tight leading-tight">
             We believe great music changes people.
           </h2>
-          <div className="mt-8 max-w-2xl space-y-4 text-lg text-white/80">
+          <div className="mt-8 max-w-2xl space-y-6 text-lg leading-relaxed text-white/80">
             <p>It breaks down barriers. It creates connection. It reminds us how good it feels to be together.</p>
             <p>
               Feelgood House isn&rsquo;t a genre rule. Deep house, tech house, disco, Afro house, melodic &mdash; the
@@ -81,7 +81,7 @@ export function FeelgoodHouse() {
       </section>
 
       {/* THE STANDARD — over night crowd */}
-      <section className="relative px-6 py-32" style={photoBg('/crowd-tent.jpg', 0.74)}>
+      <section className="relative px-6 py-24" style={photoBg('/crowd-tent.jpg', 0.74)}>
         <div className="mx-auto max-w-6xl">
           <p className="mb-6 text-sm uppercase tracking-[0.3em]" style={{ color: GOLD }}>
             The standard &mdash; trust the DJ
@@ -93,7 +93,7 @@ export function FeelgoodHouse() {
             <p>Treat every person with respect.</p>
             <p className="text-white/60">This is bigger than any one of us.</p>
           </div>
-          <p className="mt-8 max-w-2xl text-lg text-white/80">
+          <p className="mt-8 max-w-2xl text-lg leading-relaxed text-white/80">
             The booth doesn&rsquo;t make a DJ more important than the people on the floor. Confidence, style, and talent
             are welcome here. Ego isn&rsquo;t.
           </p>
@@ -101,12 +101,12 @@ export function FeelgoodHouse() {
       </section>
 
       {/* OPEN DOOR — over club crowd */}
-      <section className="relative px-6 py-32" style={photoBg('/crowd-club.jpg', 0.74)}>
+      <section className="relative px-6 py-24" style={photoBg('/crowd-club.jpg', 0.74)}>
         <div className="mx-auto max-w-6xl">
           <p className="mb-6 text-sm uppercase tracking-[0.3em]" style={{ color: GOLD }}>
             An open door
           </p>
-          <div className="max-w-3xl space-y-4 text-lg text-white/85">
+          <div className="max-w-3xl space-y-6 text-lg leading-relaxed text-white/85">
             <p>We&rsquo;re not here to convince you. We&rsquo;re here to open the door.</p>
             <p>
               If great music matters to you&hellip; if kindness matters to you&hellip; if community matters to you&hellip;
