@@ -1,1 +1,3 @@
+/guestlist https://www.feelgood-house.com/guestlist/ 301
+/guestlist/* https://www.feelgood-house.com/guestlist/ 301
 /* /index.html 200
