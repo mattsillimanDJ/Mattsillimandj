@@ -81,10 +81,8 @@ export function Navigation({ activeSection }: NavigationProps) {
     { id: 'about', label: 'About' },
     { id: 'music-production', label: 'Production and Mixes' },
     { id: 'feed', label: 'Feed' },
-    { id: 'shows', label: 'Shows' },
     { id: 'feelgood-house', label: 'Feelgood House', page: 'feelgood' },
     { id: 'gallery', label: 'Gallery', page: 'gallery' },
-    { id: 'contact', label: 'Contact' },
     { id: 'captains-of-revelry', label: 'Captains' },
   ];
 
