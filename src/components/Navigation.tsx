@@ -68,6 +68,7 @@ export function Navigation({ activeSection }: NavigationProps) {
 
   const goToGallery = () => { window.location.href = '/gallery'; };
   const goToFeelgoodHouse = () => { window.location.href = '/feelgood-house'; };
+  const goToGuestlist = () => { window.location.href = '/guestlist'; };
   const goToSignup = () => {
     const el = document.getElementById('newsletter');
     if (el) {
@@ -82,6 +83,7 @@ export function Navigation({ activeSection }: NavigationProps) {
     { id: 'music-production', label: 'Production and Mixes' },
     { id: 'feed', label: 'Feed' },
     { id: 'shows', label: 'Shows' },
+    { id: 'guestlist', label: 'Guestlist', page: 'guestlist' },
     { id: 'feelgood-house', label: 'Feelgood House', page: 'feelgood' },
     { id: 'gallery', label: 'Gallery', page: 'gallery' },
     { id: 'contact', label: 'Contact' },
@@ -92,6 +94,7 @@ export function Navigation({ activeSection }: NavigationProps) {
     setMenuOpen(false);
     if (item.page === 'gallery') goToGallery();
     else if (item.page === 'feelgood') goToFeelgoodHouse();
+    else if (item.page === 'guestlist') goToGuestlist();
     else scrollToSection(item.id);
   };
 
