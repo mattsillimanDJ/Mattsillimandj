@@ -26,13 +26,9 @@ const CMS = lazy(() => (
 const FeelgoodHouse = lazy(() => (
   import('./components/FeelgoodHouse').then((module) => ({ default: module.FeelgoodHouse }))
 ));
-const GuestlistPage = lazy(() => (
-  import('./components/GuestlistPage').then((module) => ({ default: module.GuestlistPage }))
-));
-
 export default function App() {
   const [activeSection, setActiveSection] = useState('hero');
-  const [currentPage, setCurrentPage] = useState<'home' | 'gallery' | 'press' | 'shows' | 'cms' | 'feelgood' | 'guestlist'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'gallery' | 'press' | 'shows' | 'cms' | 'feelgood'>('home');
 
   useEffect(() => {
     const setPageFromPath = () => {
@@ -51,9 +47,6 @@ export default function App() {
       } else if (path === '/feelgood-house') {
         setCurrentPage('feelgood');
         setActiveSection('feelgood-house');
-      } else if (path === '/guestlist') {
-        setCurrentPage('guestlist');
-        setActiveSection('guestlist');
       } else {
         setCurrentPage('home');
       }
@@ -89,10 +82,6 @@ export default function App() {
         title: 'Upcoming Shows | Matt Silliman',
         description: 'Upcoming Matt Silliman DJ sets and Feelgood House events in Atlanta and beyond.',
       },
-      guestlist: {
-        title: 'Feelgood House Guestlist | Matt Silliman',
-        description: 'Join the guestlist for the next Matt Silliman and Feelgood House event.',
-      },
     };
     const entry = seo[currentPage];
     if (entry) {
@@ -101,7 +90,7 @@ export default function App() {
       if (metaDescription) metaDescription.setAttribute('content', entry.description);
       const canonical = document.querySelector('link[rel="canonical"]');
       if (canonical) {
-        const paths: Record<string, string> = { home: '/', feelgood: '/feelgood-house', gallery: '/gallery', press: '/press', shows: '/shows', guestlist: '/guestlist' };
+        const paths: Record<string, string> = { home: '/', feelgood: '/feelgood-house', gallery: '/gallery', press: '/press', shows: '/shows' };
         canonical.setAttribute('href', `https://www.mattsillimandj.com${paths[currentPage] === '/' ? '/' : paths[currentPage]}`);
       }
     }
@@ -177,17 +166,6 @@ export default function App() {
         <Navigation activeSection="shows" />
         <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center">Loading shows...</div>}>
           <ShowsPage />
-        </Suspense>
-      </div>
-    );
-  }
-
-  if (currentPage === 'guestlist') {
-    return (
-      <div className="min-h-screen bg-black text-white">
-        <Navigation activeSection="guestlist" />
-        <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-black text-white">Loading guestlist…</div>}>
-          <GuestlistPage />
         </Suspense>
       </div>
     );
