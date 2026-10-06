@@ -1,4 +1,4 @@
-import { resolveArtistBio } from './src/content/artistBio';
+import { artistBio, resolveArtistBio } from './src/content/artistBio';
 
   import { defineConfig } from 'vite';
   import react from '@vitejs/plugin-react-swc';
@@ -177,7 +177,7 @@ import { resolveArtistBio } from './src/content/artistBio';
     )
       .replace(/<meta property="og:url" content="[^"]*" \/>/, '<meta property="og:url" content="https://www.mattsillimandj.com/press" />')
       .replace(/<meta property="og:title" content="[^"]*" \/>/, '<meta property="og:title" content="Press Kit | Matt Silliman DJ" />')
-      .replace('<div id="root"></div>', '<div id="root"><main class="bg-black text-white min-h-screen"><h1>Press / EPK</h1><p>A quick resource for promoters, venues, brands, and media.</p></main></div>');
+      .replace('<div id="root"></div>', `<div id="root"><main class="bg-black text-white min-h-screen px-6 pt-48 pb-24"><div class="max-w-4xl mx-auto"><h1>Press / EPK</h1><p>A quick resource for promoters, venues, brands, and media.</p><h2>Artist Bio</h2>${renderParagraphs(artistBio)}<p><a href="/Matt_Silliman_EPK.pdf">Download Matt Silliman EPK</a></p><h2>Music &amp; Gallery</h2><p><a href="/#music-production">Listen to original music and live mixes</a> | <a href="/gallery">Gallery</a></p><h2>Booking Contact</h2><a href="mailto:bookings@mattsillimanDJ.com">bookings@mattsillimanDJ.com</a></div></main></div>`);
 
     mkdirSync(path.join(buildDir, 'gallery'), { recursive: true });
     mkdirSync(path.join(buildDir, 'press'), { recursive: true });
