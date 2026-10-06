@@ -1,3 +1,4 @@
+import { artistBio } from '../content/artistBio';
 import { useEffect } from 'react';
 import { ArrowUpRight, FileText, Image, Mail, Music2 } from 'lucide-react';
 import { EPK_PDF_URL, PUBLIC_BOOKING_EMAIL, pressLinks } from './pressKitContent';
@@ -67,6 +68,12 @@ export function PressKit({ isPage = false }: PressKitProps) {
         </div>
 
         <div className="space-y-12">
+          <section className="border border-white/10 p-8 bg-white/5">
+            <h2 className="text-2xl mb-6">Artist Bio</h2>
+            <div className="space-y-6 text-white/70 leading-relaxed">
+              {artistBio.split('\n\n').map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+            </div>
+          </section>
           <section className="border border-white/10 p-8 bg-white/5 backdrop-blur-sm">
             <div className="flex items-center gap-4 mb-4">
               <FileText className="w-6 h-6 text-white/70" />

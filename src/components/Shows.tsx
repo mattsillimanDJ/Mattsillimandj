@@ -54,7 +54,7 @@ export function Shows() {
         </Reveal>
 
         {loading ? (
-          <p className="border-t border-white/10 py-6 text-white/50">Loading shows image...</p>
+          <p className="border-t border-white/10 py-6 text-white/50">Loading upcoming shows...</p>
         ) : showsImage ? (
           <Reveal scale y={50} className="flex justify-center border-t border-white/10 pt-8">
             <img
@@ -67,7 +67,7 @@ export function Shows() {
           </Reveal>
         ) : (
           <p className="border-t border-white/10 py-6 text-white/50">
-            Shows image will appear here once uploaded in the CMS.
+            For the latest dates, <a href="https://www.instagram.com/mattsilliman_dj/" className="underline hover:text-white">follow Matt on Instagram</a>.
           </p>
         )}
       </div>

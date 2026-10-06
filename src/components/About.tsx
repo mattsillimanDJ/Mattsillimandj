@@ -1,3 +1,4 @@
+import { artistBio, resolveArtistBio } from '../content/artistBio';
 import { useState, useEffect } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { normalizeCmsImages } from '../utils/cmsImages';
@@ -24,8 +25,8 @@ function isAboutContent(item: any) {
 
 export function About() {
   const [content, setContent] = useState<AboutContent>({
-    title: '',
-    content: '',
+    title: 'About Matt',
+    content: artistBio,
   });
   const [bgImageUrl, setBgImageUrl] = useState<string | null>(null);
 
@@ -42,8 +43,8 @@ export function About() {
         const aboutContent = data.content?.find(isAboutContent);
         const aboutValue = getCmsValue(aboutContent);
         setContent({
-          title: aboutValue?.title?.trim() ? aboutValue.title : '',
-          content: aboutValue?.content?.trim() ? aboutValue.content : '',
+          title: aboutValue?.title?.trim() ? aboutValue.title : 'About Matt',
+          content: resolveArtistBio(aboutValue?.content),
         });
       } catch (err) {
         console.error('Failed to load about content:', err);

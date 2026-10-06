@@ -1,3 +1,4 @@
+import { resolveArtistBio } from './src/content/artistBio';
 
   import { defineConfig } from 'vite';
   import react from '@vitejs/plugin-react-swc';
@@ -77,8 +78,8 @@
     const heroTitle = String(hero.title || '').trim();
     const heroSubtitle = String(hero.subtitle || '').trim();
     const heroDescription = String(hero.description || '').trim();
-    const aboutTitle = String(about.title || '').trim();
-    const aboutContent = renderParagraphs(about.content);
+    const aboutTitle = String(about.title || 'About Matt').trim();
+    const aboutContent = renderParagraphs(resolveArtistBio(about.content));
 
     return `
         <div class="bg-black text-white min-h-screen">
@@ -120,7 +121,7 @@
                   <h2 class="text-5xl md:text-6xl tracking-tight">Shows</h2>
                 </div>
               </div>
-              <p class="border-t border-white/10 py-6 text-white/50">Shows image will appear here once uploaded in the CMS.</p>
+              <p class="border-t border-white/10 py-6 text-white/50">For the latest dates, <a href="https://www.instagram.com/mattsilliman_dj/">follow Matt on Instagram</a>.</p>
             </div>
           </section>
           <section id="captains-of-revelry" class="relative overflow-hidden bg-neutral-950 px-6" style="min-height: 80vh; padding-top: 10rem; padding-bottom: 10rem; scroll-margin-top: 5rem;">
