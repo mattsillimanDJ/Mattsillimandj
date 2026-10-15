@@ -14,7 +14,7 @@ export function Navigation({ activeSection }: NavigationProps) {
 
   // Track viewport so we can swap to a mobile menu (many nav items don't fit on phones)
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 1080);
+    const check = () => setIsMobile(window.innerWidth < 1360);
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
@@ -82,13 +82,15 @@ export function Navigation({ activeSection }: NavigationProps) {
     { id: 'music-production', label: 'Production and Mixes' },
     { id: 'feed', label: 'Feed' },
     { id: 'feelgood-house', label: 'Feelgood House', page: 'feelgood' },
+    { id: 'weddings', label: 'Weddings', page: 'weddings' },
     { id: 'gallery', label: 'Gallery', page: 'gallery' },
     { id: 'captains-of-revelry', label: 'Captains' },
   ];
 
   const handleNav = (item: { id: string; page?: string }) => {
     setMenuOpen(false);
-    if (item.page === 'gallery') goToGallery();
+    if (item.page === 'weddings') window.location.href = '/weddings';
+    else if (item.page === 'gallery') goToGallery();
     else if (item.page === 'feelgood') goToFeelgoodHouse();
     else scrollToSection(item.id);
   };
