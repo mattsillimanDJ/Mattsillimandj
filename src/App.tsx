@@ -26,14 +26,19 @@ const CMS = lazy(() => (
 const FeelgoodHouse = lazy(() => (
   import('./components/FeelgoodHouse').then((module) => ({ default: module.FeelgoodHouse }))
 ));
+const WeddingsPage = lazy(() => import('./components/WeddingsPage').then((module) => ({ default: module.WeddingsPage })));
+
 export default function App() {
   const [activeSection, setActiveSection] = useState('hero');
-  const [currentPage, setCurrentPage] = useState<'home' | 'gallery' | 'press' | 'shows' | 'cms' | 'feelgood'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'gallery' | 'press' | 'shows' | 'cms' | 'feelgood' | 'weddings'>(() => window.location.pathname.replace(/\/$/, '') === '/weddings' ? 'weddings' : 'home');
 
   useEffect(() => {
     const setPageFromPath = () => {
       const path = window.location.pathname.replace(/\/$/, '') || '/';
-      if (path === '/cms') {
+      if (path === '/weddings') {
+        setCurrentPage('weddings');
+        setActiveSection('weddings');
+      } else if (path === '/cms') {
         setCurrentPage('cms');
       } else if (path === '/gallery') {
         setCurrentPage('gallery');
@@ -60,6 +65,10 @@ export default function App() {
 
   useEffect(() => {
     const seo: Record<string, { title: string; description: string }> = {
+      weddings: {
+        title: 'House Music Weddings & After Parties | Matt Silliman',
+        description: 'House music wedding parties and wedding after parties with Atlanta DJ Matt Silliman. Soulful house, disco, vocal favorites and late-night energy, shaped around you.',
+      },
       home: {
         title: 'Matt Silliman | Feelgood House Music DJ & Producer',
         description:
@@ -90,7 +99,7 @@ export default function App() {
       if (metaDescription) metaDescription.setAttribute('content', entry.description);
       const canonical = document.querySelector('link[rel="canonical"]');
       if (canonical) {
-        const paths: Record<string, string> = { home: '/', feelgood: '/feelgood-house', gallery: '/gallery', press: '/press', shows: '/shows' };
+        const paths: Record<string, string> = { weddings: '/weddings', home: '/', feelgood: '/feelgood-house', gallery: '/gallery', press: '/press', shows: '/shows' };
         canonical.setAttribute('href', `https://www.mattsillimandj.com${paths[currentPage] === '/' ? '/' : paths[currentPage]}`);
       }
     }
@@ -118,6 +127,17 @@ export default function App() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [currentPage]);
+
+  if (currentPage === 'weddings') {
+    return (
+      <div className="bg-black text-white min-h-screen">
+        <Navigation activeSection="weddings" />
+        <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center">Loading weddings...</div>}>
+          <WeddingsPage />
+        </Suspense>
+      </div>
+    );
+  }
 
   if (currentPage === 'cms') {
     return (
