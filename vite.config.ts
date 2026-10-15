@@ -1,3 +1,6 @@
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { WeddingsPage, weddingTitle, weddingDescription } from './src/components/WeddingsPage';
 import { artistBio, resolveArtistBio } from './src/content/artistBio';
 
   import { defineConfig } from 'vite';
@@ -178,6 +181,17 @@ import { artistBio, resolveArtistBio } from './src/content/artistBio';
       .replace(/<meta property="og:url" content="[^"]*" \/>/, '<meta property="og:url" content="https://www.mattsillimandj.com/press" />')
       .replace(/<meta property="og:title" content="[^"]*" \/>/, '<meta property="og:title" content="Press Kit | Matt Silliman DJ" />')
       .replace('<div id="root"></div>', `<div id="root"><main class="bg-black text-white min-h-screen px-6 pt-48 pb-24"><div class="max-w-4xl mx-auto"><h1>Press / EPK</h1><p>A quick resource for promoters, venues, brands, and media.</p><h2>Artist Bio</h2>${renderParagraphs(artistBio)}<p><a href="/Matt_Silliman_EPK.pdf">Download Matt Silliman EPK</a></p><h2>Music &amp; Gallery</h2><p><a href="/#music-production">Listen to original music and live mixes</a> | <a href="/gallery">Gallery</a></p><h2>Booking Contact</h2><a href="mailto:bookings@mattsillimanDJ.com">bookings@mattsillimanDJ.com</a></div></main></div>`);
+
+    const weddingsHtml = baseHtml
+      .replace(/<title>.*?<\/title>/, `<title>${escapeHtml(weddingTitle)}</title>`)
+      .replace(/(<meta\s+name="description"\s+content=")[^"]*("\s*\/>)/, `$1${escapeHtml(weddingDescription)}$2`)
+      .replace(/<link rel="canonical" href="[^"]*" \/>/, '<link rel="canonical" href="https://www.mattsillimandj.com/weddings" />')
+      .replace(/(<meta property="og:url" content=")[^"]*/, '$1https://www.mattsillimandj.com/weddings')
+      .replace(/(<meta (?:property="og:title"|name="twitter:title") content=")[^"]*/g, `$1${escapeHtml(weddingTitle)}`)
+      .replace(/(<meta\s+(?:property="og:description"|name="twitter:description")\s+content=")[^"]*/g, `$1${escapeHtml(weddingDescription)}`)
+      .replace('<div id="root"></div>', `<div id="root">${renderToStaticMarkup(createElement(WeddingsPage))}</div>`);
+    mkdirSync(path.join(buildDir, 'weddings'), { recursive: true });
+    writeFileSync(path.join(buildDir, 'weddings', 'index.html'), weddingsHtml);
 
     mkdirSync(path.join(buildDir, 'gallery'), { recursive: true });
     mkdirSync(path.join(buildDir, 'press'), { recursive: true });
