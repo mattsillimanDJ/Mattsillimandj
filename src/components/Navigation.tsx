@@ -75,6 +75,21 @@ export function Navigation({ activeSection }: NavigationProps) {
     loadLogo();
   }, []);
 
+  // React mounts section targets after the browser's initial fragment jump.
+  useEffect(() => {
+    const scrollToHash = () => {
+      if (window.location.pathname !== '/' || !window.location.hash) return;
+      const target = document.getElementById(window.location.hash.slice(1));
+      target?.scrollIntoView({ behavior: 'smooth' });
+    };
+    const frame = window.requestAnimationFrame(scrollToHash);
+    window.addEventListener('hashchange', scrollToHash);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener('hashchange', scrollToHash);
+    };
+  }, []);
+
   const scrollToSection = (sectionId: string) => {
     if (window.location.pathname !== '/') {
       window.location.href = `/#${sectionId}`;
@@ -201,3 +216,4 @@ export function Navigation({ activeSection }: NavigationProps) {
     </nav>
   );
 }
+
