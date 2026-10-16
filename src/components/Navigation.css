@@ -1,0 +1,33 @@
+/* Explicit rules: this project ships precompiled utility CSS. */
+@media (max-width: 1359.98px) {
+  .site-navigation.nav-anim { transform: none; }
+  .site-navigation .nav-container { padding: 10px 16px; height: 64px; }
+  .site-navigation .nav-home { display: flex; align-items: center; min-width: 0; height: 44px; }
+  .site-navigation .nav-logo {
+    display: block;
+    width: 120px;
+    max-width: 100%;
+    height: 44px;
+    object-fit: contain;
+    object-position: left center;
+  }
+  .site-navigation .nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    color: white;
+  }
+  .site-navigation .nav-mobile-menu {
+    max-height: calc(100vh - 64px);
+    max-height: calc(100dvh - 64px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 12px 16px;
+  }
+  .site-navigation .nav-mobile-menu > div { gap: 8px; }
+  .site-navigation .nav-mobile-menu button { min-height: 44px; }
+  html { scroll-padding-top: 80px; }
+}
