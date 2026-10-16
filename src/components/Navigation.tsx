@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { normalizeCmsImages } from '../utils/cmsImages';
+import './Navigation.css';
 
 interface NavigationProps {
   activeSection: string;
@@ -9,19 +10,39 @@ interface NavigationProps {
 export function Navigation({ activeSection }: NavigationProps) {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [hidden, setHidden] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 1360);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const menuButton = useRef<HTMLButtonElement>(null);
 
   // Track viewport so we can swap to a mobile menu (many nav items don't fit on phones)
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 1360);
+    const check = () => {
+      const mobile = window.innerWidth < 1360;
+      setIsMobile(mobile);
+      if (!mobile) setMenuOpen(false);
+    };
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Hide nav scrolling down, reveal scrolling up
   useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false);
+        menuButton.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [menuOpen]);
+
+  // Preserve desktop hide-on-scroll; mobile navigation stays accessible.
+  useEffect(() => {
+    setHidden(false);
+    if (isMobile) return;
     let lastY = window.scrollY;
     const onScroll = () => {
       const y = window.scrollY;
@@ -34,7 +55,7 @@ export function Navigation({ activeSection }: NavigationProps) {
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [isMobile]);
 
   useEffect(() => {
     const loadLogo = async () => {
@@ -56,7 +77,6 @@ export function Navigation({ activeSection }: NavigationProps) {
 
   const scrollToSection = (sectionId: string) => {
     if (window.location.pathname !== '/') {
-      window.history.pushState({}, '', '/');
       window.location.href = `/#${sectionId}`;
       return;
     }
@@ -96,15 +116,16 @@ export function Navigation({ activeSection }: NavigationProps) {
   };
 
   return (
-    <nav className={`nav-anim fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10 ${hidden ? 'nav-hidden' : ''}`}>
-      <div className="max-w-7xl mx-auto px-6 py-4">
+    <nav aria-label="Main navigation" className={`site-navigation nav-anim fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10 ${hidden && !isMobile && !menuOpen ? 'nav-hidden' : ''}`}>
+      <div className="nav-container max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <button
             onClick={() => { setMenuOpen(false); scrollToSection('hero'); }}
-            className="hover:opacity-70 transition-opacity"
+            aria-label="Matt Silliman home"
+            className="nav-home hover:opacity-70 transition-opacity"
           >
             {logoUrl && (
-              <img src={logoUrl} alt="Matt Silliman Logo" className={isMobile ? 'h-14' : 'h-24'} />
+              <img src={logoUrl} alt="Matt Silliman Logo" className={isMobile ? 'nav-logo' : 'h-24'} />
             )}
           </button>
 
@@ -133,13 +154,16 @@ export function Navigation({ activeSection }: NavigationProps) {
 
           {isMobile && (
             <button
-              aria-label="Menu"
+              ref={menuButton}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-navigation"
               onClick={() => setMenuOpen((o) => !o)}
-              className="flex flex-col justify-center gap-1.5 p-2"
+              className="nav-toggle"
             >
-              <span className="block h-0.5 w-7 bg-white" />
-              <span className="block h-0.5 w-7 bg-white" />
-              <span className="block h-0.5 w-7 bg-white" />
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d={menuOpen ? 'M6 6l12 12M6 18L18 6' : 'M3 6h18M3 12h18M3 18h18'} />
+              </svg>
             </button>
           )}
         </div>
@@ -147,7 +171,9 @@ export function Navigation({ activeSection }: NavigationProps) {
 
       {isMobile && menuOpen && (
         <div
-          className="border-t border-white/10 bg-black/95 px-6 py-6"
+          id="mobile-navigation"
+          data-lenis-prevent
+          className="nav-mobile-menu border-t border-white/10 bg-black/95 px-6 py-6"
           style={{ backdropFilter: 'blur(8px)' }}
         >
           <div className="flex flex-col gap-5">
