@@ -117,7 +117,7 @@ export function Navigation({ activeSection }: NavigationProps) {
     { id: 'music-production', label: 'Production and Mixes' },
     { id: 'feed', label: 'Feed' },
     { id: 'feelgood-house', label: 'Feelgood House', page: 'feelgood' },
-    { id: 'weddings', label: 'Weddings', page: 'weddings' },
+    { id: 'weddings', label: 'House Music Weddings', page: 'weddings' },
     { id: 'gallery', label: 'Gallery', page: 'gallery' },
     { id: 'captains-of-revelry', label: 'Captains' },
   ];
