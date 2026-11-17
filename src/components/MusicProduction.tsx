@@ -15,6 +15,25 @@ interface MusicItem {
   embedCode: string;
 }
 
+const FEATURED_BREAKBEATS = [
+  {
+    "title": "Blow the Roof Off (Funk b-boy break beat rendition)",
+    "id": "2433358710"
+  },
+  {
+    "title": "Imma make you dance (feelgood break beat)",
+    "id": "2433704280"
+  },
+  {
+    "title": "Got That Juice - Dirty South Breaks",
+    "id": "2436428664"
+  },
+  {
+    "title": "Oooh Papi!",
+    "id": "2433724305"
+  }
+];
+
 const COMPACT_SOUNDCLOUD_PLAYER_HEIGHT = '166';
 
 function normalizeSoundCloudEmbedHtml(embedCode: string) {
@@ -160,7 +179,7 @@ export function MusicProduction() {
   const productions = [
     {
       title: 'Originals',
-      description: 'From tech house bangers to deep house late-night grooves, here are some of my latest releases.',
+      description: 'From funky breakbeats to tech house bangers and deep house grooves, explore my original releases.',
       icon: Music,
       scrollTo: 'recent-releases',
       category: 'originals' as PublicMusicCategory,
@@ -216,7 +235,7 @@ export function MusicProduction() {
         </Reveal>
         <Reveal y={40} delay={0.1}>
           <p className="max-w-3xl mb-16 text-lg text-white/60 leading-relaxed">
-            Curated originals and sets that move between deep, soulful warmth and high-energy house.
+            Fresh breakbeats, original house productions, and live sets built to move you.
           </p>
         </Reveal>
 
@@ -247,6 +266,19 @@ export function MusicProduction() {
             );
           })}
         </Reveal>
+
+        <div className="max-w-3xl mx-auto mb-24">
+          <h3 className="text-3xl mb-4">Latest Breakbeats</h3>
+          <p className="mb-10 text-white/60">Funky breaks, Dirty South energy, and Latin flavor.</p>
+          <div className="space-y-6">
+            {FEATURED_BREAKBEATS.map((track) => (
+              <div key={track.id} className="hover-lift border border-white/10 p-6 bg-white/5 hover:bg-white/10">
+                <h4 className="text-xl mb-4">{track.title}</h4>
+                <MusicEmbed embedCode={`<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" title="${track.title}" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${track.id}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>`} />
+              </div>
+            ))}
+          </div>
+        </div>
 
         {cmsEmbeds.length > 0 ? (
           <Reveal stagger={0.1} y={40} as="div" className="max-w-3xl mx-auto space-y-6" style={undefined}>
